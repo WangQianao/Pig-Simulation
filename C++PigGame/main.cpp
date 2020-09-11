@@ -6,245 +6,318 @@
 void mainMenu();
 void gameMenu();
 void checkMenu();
-void nextTime(int day,PigFarm*pigFarm); 
-void InitializeGame(PigFarm*pigFarm);
-int gameDay=0;//游戏进行天数 
-int lastSalePigDay=0;//上次猪出圈的日期 
+void nextTime(int day,PigFarm*pigFarm);
+void InitializeGame(PigFarm*pigFarm,int day);
+void readSaleAndBuyInfo();
+void clearFile(string filename);
+void copySaleFile();
+void saveGameInfo(PigFarm*pigFarm,int day);
+int gameDay=0;//脫脦脧路陆酶脨脨脤矛脢媒
+int lastSalePigDay=0;//脡脧麓脦脰铆鲁枚脠娄碌脛脠脮脝脷
 int main(int argc, char** argv) {
 	srand((unsigned)time(NULL));
 	int select=0;
-	PigFarm *pigFarm=new PigFarm; 
-	while(true)
-	{
+	PigFarm *pigFarm=new PigFarm;
+	while(true) {
 		mainMenu();
 		cin>>select;
-		switch(select)
-		{
-			case 1://新的开始
+		switch(select) {
+			case 1://脨脗碌脛驴陋脢录
+			clearFile("TemporaryPigSaleAndBuyInfo.txt");
+			clearFile("PigSaleAndBuyInfo.txt");
 				system("cls");
-				InitializeGame(pigFarm);
-				while(true)
-				{
+				InitializeGame(pigFarm,gameDay);
+				while(true) {
 					bool exitFlag=false;
 					int select=0;
 					system("cls");
 					gameMenu();
-					if((gameDay-lastSalePigDay)/30>=3)//出圈一批猪并购入一批猪崽 
-					{
-						cout<<"到养猪场要出圈一批猪的时间了"<<endl;
-						pigFarm->salePigs(); 
+					if((gameDay-lastSalePigDay)/30>=3) { //鲁枚脠娄脪禄脜煤脰铆虏垄鹿潞脠毛脪禄脜煤脰铆谩脤
+						cout<<"碌陆脩酶脰铆鲁隆脪陋鲁枚脠娄脪禄脜煤脰铆碌脛脢卤录盲脕脣"<<endl;
+						pigFarm->salePigs(gameDay);
+						cout<<"脥卢脢卤拢卢脪虏脪陋脦陋脩酶脰铆鲁隆鹿潞脠毛脪禄脜煤脰铆谩脤"<<endl;
 						system("pause");
-						pigFarm->addPigs();  
+						pigFarm->addPigs(gameDay);
 						lastSalePigDay=gameDay;
-					}
-					else
-					{
-						cout<<"请输入您要进行的操作(选项前面的数字): "<<endl;
+					} else {
+						cout<<"脟毛脢盲脠毛脛煤脪陋陆酶脨脨碌脛虏脵脳梅(脩隆脧卯脟掳脙忙碌脛脢媒脳脰): "<<endl;
 						cin>>select;
-						switch(select)
-						{
-							case 1://查询猪场相关信息  
-							
-							while(true)
-							{	
-								bool exitFlag=false;
-								int select=0,pigStyIndex;
-								system("cls");
-								checkMenu();
-								cout<<"请输入您要进行的操作(选项前面的数字): "<<endl;
-								cin>>select;
-							
-								switch(select)
-								{
-									case 1://查询某一猪圈的猪的数量和种类 
-										
-										while(true)
-										{
-											cout<<"请输入你要查询的猪圈编号(0-99)："<<endl;
-											cin>>pigStyIndex;
-											if(pigStyIndex>=0&&pigStyIndex<=99)
-											{
-												pigFarm->pigStys[pigStyIndex].print(pigStyIndex);
-												system("pause");
-												break;
-											}else{
-												cout<<"输入错误的编号，请重新输入"<<endl;
-												system("pause");
-											}
-										}
-											break;
-										
-										
-										case 2:
-											
-											cout<<"请输入你要查询的猪圈编号(0-99)："<<endl;
-											while(true)
-											{
+						switch(select) {
+							case 1://虏茅脩炉脰铆鲁隆脧脿鹿脴脨脜脧垄
+
+								while(true) {
+									bool exitFlag=false;
+									int select=0,pigStyIndex;
+									system("cls");
+									checkMenu();
+									cout<<"脟毛脢盲脠毛脛煤脪陋陆酶脨脨碌脛虏脵脳梅(脩隆脧卯脟掳脙忙碌脛脢媒脳脰): "<<endl;
+									cin>>select;
+
+									switch(select) {
+										case 1://虏茅脩炉脛鲁脪禄脰铆脠娄碌脛脰铆碌脛脢媒脕驴潞脥脰脰脌脿
+
+											while(true) {
+												cout<<"脟毛脢盲脠毛脛茫脪陋虏茅脩炉碌脛脰铆脠娄卤脿潞脜(0-99)拢潞"<<endl;
 												cin>>pigStyIndex;
-												if(pigStyIndex>=0&&pigStyIndex<=99)
-												{
-													if(pigFarm->pigStys[pigStyIndex].getPigNum()==0)
-													{
-														cout<<"该猪圈现在没有猪，故无法查询某头猪的信息"<<endl;
-													}
-													else
-													{
+												if(pigStyIndex>=0&&pigStyIndex<=99) {
+													pigFarm->pigStys[pigStyIndex].print(pigStyIndex);
+													system("pause");
+													break;
+												} else {
+													cout<<"脢盲脠毛麓铆脦贸碌脛卤脿潞脜拢卢脟毛脰脴脨脗脢盲脠毛"<<endl;
+													system("pause");
+												}
+											}
+											break;
+
+
+										case 2:
+
+											cout<<"脟毛脢盲脠毛脛茫脪陋虏茅脩炉碌脛脰铆脠娄卤脿潞脜(0-99)拢潞"<<endl;
+											while(true) {
+												cin>>pigStyIndex;
+												if(pigStyIndex>=0&&pigStyIndex<=99) {
+													if(pigFarm->pigStys[pigStyIndex].getPigNum()==0) {
+														cout<<"赂脙脰铆脠娄脧脰脭脷脙禄脫脨脰铆拢卢鹿脢脦脼路篓虏茅脩炉脛鲁脥路脰铆碌脛脨脜脧垄"<<endl;
+													} else {
 														int pigIndex;
-														cout<<"该猪圈现共有"<<pigFarm->pigStys[pigStyIndex].getPigNum()<<"头猪"<<endl;
-														cout<<"您可以查询编号为0-"<<pigFarm->pigStys[pigStyIndex].getPigNum()-1<<"的猪的信息"<<endl;
-														cout<<"请输入您要查询的猪的编号:  "<<endl;
+														cout<<"赂脙脰铆脠娄脧脰鹿虏脫脨"<<pigFarm->pigStys[pigStyIndex].getPigNum()<<"脥路脰铆"<<endl;
+														cout<<"脛煤驴脡脪脭虏茅脩炉卤脿潞脜脦陋0-"<<pigFarm->pigStys[pigStyIndex].getPigNum()-1<<"碌脛脰铆碌脛脨脜脧垄"<<endl;
+														cout<<"脟毛脢盲脠毛脛煤脪陋虏茅脩炉碌脛脰铆碌脛卤脿潞脜:  "<<endl;
 														cin>>pigIndex;
 														pigFarm->pigStys[pigStyIndex][pigIndex].pigPrint();
 													}
-													
+
 													break;
-													
-												}else{
-													cout<<"输入错误的编号，请重新输入"<<endl;
-					
+
+												} else {
+													cout<<"脢盲脠毛麓铆脦贸碌脛卤脿潞脜拢卢脟毛脰脴脨脗脢盲脠毛"<<endl;
+
 												}
 											}
-											
-											
+
+
 											system("pause");
-											
-											
-											
-										break;
-										case 3:
-										system("cls");
-										pigFarm->printEachBreedDistribution();
-										system("pause");		
-				
-										break;
-										case 4:
-											
-											
-										break;
-										case 5:
-										break;
-										case 6://返回上一界面 
-										exitFlag=true;
-										break;
-										default:
-											cout<<"输入错误，请重新输入!"<<endl;
-											system("pause");
-											system("cls");	
+
+
+
 											break;
+										case 3:
+											system("cls");
+											pigFarm->printEachBreedDistribution();
+											system("pause");
+
+											break;
+										case 4://虏茅脩炉脧煤脢脹潞脥鹿潞脠毛录脟脗录
+											readSaleAndBuyInfo();
+											system("pause");
+											break;
+										case 5:
+											break;
+										case 6://路碌禄脴脡脧脪禄陆莽脙忙
+											exitFlag=true;
+											break;
+										default:
+											cout<<"脢盲脠毛麓铆脦贸拢卢脟毛脰脴脨脗脢盲脠毛!"<<endl;
+											system("pause");
+											system("cls");
+											break;
+									}
+									if(exitFlag)break;
 								}
-								if(exitFlag)break;
-							}
-							
+
 								break;
-								case 2://进入下一天
+							case 2://陆酶脠毛脧脗脪禄脤矛
 								nextTime(1,pigFarm);
 								break;
-								case 3://进入下一个月
+							case 3://陆酶脠毛脧脗脪禄赂枚脭脗
 								nextTime(30,pigFarm);
 								break;
-								case 4://保存游戏
+							case 4://卤拢麓忙脫脦脧路
+							copySaleFile();
+							saveGameInfo(pigFarm,gameDay);
+							
 								break;
-								case 5://退回游戏主界面(不会自动保存)
+							case 5://脥脣禄脴脫脦脧路脰梅陆莽脙忙(虏禄禄谩脳脭露炉卤拢麓忙)
 								exitFlag=true;
 								break;
-								default:
-								cout<<"输入错误，请重新输入!"<<endl;
+							default:
+								cout<<"脢盲脠毛麓铆脦贸拢卢脟毛脰脴脨脗脢盲脠毛!"<<endl;
 								system("pause");
-								system("cls");	
+								system("cls");
 								break;
 						}
 					}
 					if(exitFlag)break;
-					
+
 				}
-					
+
 				break;
-			case 2 :    //读取存档 
-			
-			
+			case 2 :    //露脕脠隆麓忙碌碌
+
+
 				break;
-			case 3 :    //退出 
+			case 3 :    //脥脣鲁枚
 				return 0;
-			    break;
+				break;
 			default:
-			    cout<<"输入错误，请重新输入!"<<endl;
+				cout<<"脢盲脠毛麓铆脦贸拢卢脟毛脰脴脨脗脢盲脠毛!"<<endl;
 				system("pause");
-			    break;
+				break;
 		}
 		system("cls");
 	}
-	
+
 	return 0;
 }
-void checkMenu()
+void copySaleFile()
 {
-	cout<<"========================查询界面==================================";
-		cout<<endl;
-		cout<<endl<<"您可进行如下操作："<<endl;
-		cout<<"\t\t-------------------------------------------------------------------------\n";
-		cout<<"\t\t|                                                                        |\n";
-		cout<<"\t\t|                  1.  查询某一猪圈的猪的数量和种类                      |\n";
-		cout<<"\t\t|                                                                        |\n";
-		cout<<"\t\t|                  2.  查询某一猪圈某头猪的状态信息                      |\n";
-	    cout<<"\t\t|                                                                        |\n";
-	   	cout<<"\t\t|                  3.  统计猪场每个品种猪的数量和体重、饲养时间分布情况  |\n";
-	   	cout<<"\t\t|                                                                        |\n";
-		cout<<"\t\t|                  4.  查询近5年猪的销售记录和猪崽儿的购入记录           |\n";
-		cout<<"\t\t|                                                                        |\n";
-		cout<<"\t\t|                  5.  打印当前猪场所有信息                              |\n";
-		cout<<"\t\t|                                                                        |\n";
-		cout<<"\t\t|                  6.  返回上一界面                                      |\n";
-		cout<<"\t\t|                                                                        |\n";
-		cout<<"\t\t-------------------------------------------------------------------------\n";
+	ifstream ifs("TemporaryPigSaleAndBuyInfo.txt",ios::in);
+	ofstream ofs("PigSaleAndBuyInfo.txt",ios::out|ios::app);
+	if(!ifs||!ofs)
+	{
+		cout<<"麓貌驴陋脦脛录镁脢搂掳脺"<<endl;
+		exit(0);
+	}
+	ifs.unsetf(ios::skipws);
+	char ch;
+	while(ifs>>ch)
+	ofs<<ch;
+	ifs.close();
+	ofs.close();
+	clearFile("TemporaryPigSaleAndBuyInfo.txt");
 }
-void nextTime(int day,PigFarm*pigFarm)
+void readSaleAndBuyInfo() {
+	ifstream ifs;
+	char flag;
+	int day,blackPig,smallFlowerPig,bigWhitePig;
+	double price;
+	ifs.open("PigSaleAndBuyInfo.txt",ios::in);
+	if(!ifs) {
+		cout<<"麓貌驴陋脧煤脢脹录脟脗录脦脛录镁脢搂掳脺"<<endl;
+		exit(0);
+	}
+	while(ifs>>flag&&ifs>>day&&ifs>>blackPig&&ifs>>smallFlowerPig&&ifs>>bigWhitePig) {
+		cout<<"脭脷碌脷"<<day<<"脤矛";
+		if(flag=='+') {
+			ifs>>price;
+
+			cout<<"脗么鲁枚"<<blackPig<<"脥路潞脷脰铆      "<<smallFlowerPig<<"脥路脨隆禄篓脰铆       "<<bigWhitePig<<"脥路麓贸掳脳脰铆"<<endl;
+			cout<<"脮芒麓脦脗么鲁枚碌脛脰铆碌脛脳脺脤氓脢脹录脹脦陋: "<<std::fixed<<price<<"脭陋"<<endl;
+		} else {
+
+			cout<<"鹿潞脠毛"<<blackPig<<"脥路潞脷脰铆      "<<smallFlowerPig<<"脥路脨隆禄篓脰铆       "<<bigWhitePig<<"脥路麓贸掳脳脰铆"<<endl;
+
+		}
+	}
+	ifs.close();
+	ifs.open("TemporaryPigSaleAndBuyInfo.txt",ios::in);
+	if(!ifs) {
+		cout<<"麓貌驴陋脧煤脢脹录脟脗录脦脛录镁脢搂掳脺"<<endl;
+		exit(0);
+	}
+	while(ifs>>flag&&ifs>>day&&ifs>>blackPig&&ifs>>smallFlowerPig&&ifs>>bigWhitePig) {
+		cout<<"脭脷碌脷"<<day<<"脤矛";
+		if(flag=='+') {
+			ifs>>price;
+
+			cout<<"脗么鲁枚"<<blackPig<<"脥路潞脷脰铆      "<<smallFlowerPig<<"脥路脨隆禄篓脰铆       "<<bigWhitePig<<"脥路麓贸掳脳脰铆"<<endl;
+			cout<<"脮芒麓脦脗么鲁枚碌脛脰铆碌脛脳脺脤氓脢脹录脹脦陋: "<<std::fixed<<price<<"脭陋"<<endl;
+		} else {
+
+			cout<<"鹿潞脠毛"<<blackPig<<"脥路潞脷脰铆      "<<smallFlowerPig<<"脥路脨隆禄篓脰铆       "<<bigWhitePig<<"脥路麓贸掳脳脰铆"<<endl;
+
+		}
+	}
+	ifs.close();
+	
+}
+void saveGameInfo(PigFarm*pigFarm,int day)
 {
+	ofstream ofs;
+	ofs.open("PigGameInfo.txt",ios::out);
+	ofs<<day<<endl;
+	ofs<<pigFarm->getTotalPigNums()<<" "<<pigFarm->getTotalBlackPigNums()<<" "<<pigFarm->getTotalSmallFlowerPigNums()<<" "<<pigFarm->getTotalBigWhitePigNums()<<" "<<pigFarm->getFlowerPigStyIndex()<<endl;
+    for(int i=0;i<PigFarm::totalPigStyNums;i++)
+    {
+    	ofs<<pigFarm->pigStys[i].getPigNum()<<" "<<pigFarm->pigStys[i].getBlackPigNum()<<" "<<pigFarm->pigStys[i].getSmallFlowerPigNum()<<" "<<pigFarm->pigStys[i].getBigWhitePigNum()<<endl;
+    	for(Pig*p=pigFarm->pigStys[i].first();p!=pigFarm->pigStys[i].last()->succ;p=p->succ)
+    	{
+    		ofs<<p->getWeight()<<" "<<p->getGrowDay()<<" "<<p->getBreed()<<endl;
+		}
+	}
+	ofs.close();
+}
+void clearFile(string filename)
+{
+	ofstream ofs;
+	ofs.open(filename,ios::out);
+	ofs.close();
+}
+void checkMenu() {
+	cout<<"========================虏茅脩炉陆莽脙忙==================================";
+	cout<<endl;
+	cout<<endl<<"脛煤驴脡陆酶脨脨脠莽脧脗虏脵脳梅拢潞"<<endl;
+	cout<<"\t\t-------------------------------------------------------------------------\n";
+	cout<<"\t\t|                                                                        |\n";
+	cout<<"\t\t|                  1.  虏茅脩炉脛鲁脪禄脰铆脠娄碌脛脰铆碌脛脢媒脕驴潞脥脰脰脌脿                      |\n";
+	cout<<"\t\t|                                                                        |\n";
+	cout<<"\t\t|                  2.  虏茅脩炉脛鲁脪禄脰铆脠娄脛鲁脥路脰铆碌脛脳麓脤卢脨脜脧垄                      |\n";
+	cout<<"\t\t|                                                                        |\n";
+	cout<<"\t\t|                  3.  脥鲁录脝脰铆鲁隆脙驴赂枚脝路脰脰脰铆碌脛脢媒脕驴潞脥脤氓脰脴隆垄脣脟脩酶脢卤录盲路脰虏录脟茅驴枚  |\n";
+	cout<<"\t\t|                                                                        |\n";
+	cout<<"\t\t|                  4.  虏茅脩炉陆眉5脛锚脰铆碌脛脧煤脢脹录脟脗录潞脥脰铆谩脤露霉碌脛鹿潞脠毛录脟脗录           |\n";
+	cout<<"\t\t|                                                                        |\n";
+	cout<<"\t\t|                  5.  麓貌脫隆碌卤脟掳脰铆鲁隆脣霉脫脨脨脜脧垄                              |\n";
+	cout<<"\t\t|                                                                        |\n";
+	cout<<"\t\t|                  6.  路碌禄脴脡脧脪禄陆莽脙忙                                      |\n";
+	cout<<"\t\t|                                                                        |\n";
+	cout<<"\t\t-------------------------------------------------------------------------\n";
+}
+void nextTime(int day,PigFarm*pigFarm) {
 	gameDay+=day;
 	pigFarm->pigFarmNextTime(day);
 }
-void InitializeGame(PigFarm*pigFarm)
-{
+void InitializeGame(PigFarm*pigFarm,int day) {
 	gameDay=1;
 	lastSalePigDay=1;
-	cout<<"===================欢迎开始新的游戏=========================="<<endl;
-	cout<<"现在请为养猪场添加第一批猪崽"<<endl;
+	cout<<"===================禄露脫颅驴陋脢录脨脗碌脛脫脦脧路=========================="<<endl;
+	cout<<"脧脰脭脷脟毛脦陋脩酶脰铆鲁隆脤铆录脫碌脷脪禄脜煤脰铆谩脤"<<endl;
 	system("pause");
-	pigFarm->addPigs();
-	
+	pigFarm->addPigs(day);
+
 }
-void gameMenu()
-{
-	    cout<<"========================养猪场==================================";
-		cout<<endl;
-		cout<<endl<<"您可进行如下操作："<<endl;
-		cout<<"\t\t----------------------------------------------------------\n";
-		cout<<"\t\t|                                                         |\n";
-		cout<<"\t\t|                  1.  查询猪场相关信息                   |\n";
-		cout<<"\t\t|                                                         |\n";
-		cout<<"\t\t|                  2.  进入下一天                         |\n";
-	    cout<<"\t\t|                                                         |\n";
-	   	cout<<"\t\t|                  3.  进入下一个月                       |\n";
-	   	cout<<"\t\t|                                                         |\n";
-		cout<<"\t\t|                  4.  保存游戏                           |\n";
-		cout<<"\t\t|                                                         |\n";
-		cout<<"\t\t|                  5.  退回游戏主界面(不会自动保存)       |\n";
-		cout<<"\t\t|                                                         |\n";
-		cout<<"\t\t----------------现在是第"<<gameDay<<"天------------------------------------------\n";
-		
+void gameMenu() {
+	cout<<"========================脩酶脰铆鲁隆==================================";
+	cout<<endl;
+	cout<<endl<<"脛煤驴脡陆酶脨脨脠莽脧脗虏脵脳梅拢潞"<<endl;
+	cout<<"\t\t----------------------------------------------------------\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t|                  1.  虏茅脩炉脰铆鲁隆脧脿鹿脴脨脜脧垄                   |\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t|                  2.  陆酶脠毛脧脗脪禄脤矛                         |\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t|                  3.  陆酶脠毛脧脗脪禄赂枚脭脗                       |\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t|                  4.  卤拢麓忙脫脦脧路                           |\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t|                  5.  脥脣禄脴脫脦脧路脰梅陆莽脙忙(虏禄禄谩脳脭露炉卤拢麓忙)       |\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t----------------脧脰脭脷脢脟碌脷"<<gameDay<<"脤矛------------------------------------------\n";
+
 }
-void mainMenu()
-{
-	cout<<"========================欢迎来到养猪游戏===================================";
-		cout<<endl;
-		cout<<endl<<"您可进行如下操作："<<endl;
-		cout<<"\t\t----------------------------------------------------------\n";
-		cout<<"\t\t|                                                         |\n";
-		cout<<"\t\t|                  1.  新的开始                           |\n";
-		cout<<"\t\t|                                                         |\n";
-		cout<<"\t\t|                  2.  读取存档                           |\n";
-		cout<<"\t\t|                                                         |\n";
-		cout<<"\t\t|                  3.  退出                               |\n";
-		cout<<"\t\t|                                                         |\n";
-		cout<<"\t\t----------------------------------------------------------\n";
-		cout<<"请输入您要进行的操作(选项前面的数字): "<<endl;
+void mainMenu() {
+	cout<<"========================禄露脫颅脌麓碌陆脩酶脰铆脫脦脧路===================================";
+	cout<<endl;
+	cout<<endl<<"脛煤驴脡陆酶脨脨脠莽脧脗虏脵脳梅拢潞"<<endl;
+	cout<<"\t\t----------------------------------------------------------\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t|                  1.  脨脗碌脛驴陋脢录                           |\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t|                  2.  露脕脠隆麓忙碌碌                           |\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t|                  3.  脥脣鲁枚                               |\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t----------------------------------------------------------\n";
+	cout<<"脟毛脢盲脠毛脛煤脪陋陆酶脨脨碌脛虏脵脳梅(脩隆脧卯脟掳脙忙碌脛脢媒脳脰): "<<endl;
 }
