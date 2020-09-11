@@ -5,12 +5,12 @@ PigFarm::PigFarm()
     this->totalPigNums=0;
     this->totalBlackPigNums=0;
     this->totalSmallFlowerPigNums=0;
-    this->totalBigWhightPigNums=0;
+    this->totalBigWhitePigNums=0;
     this->flowerPigStyIndex=0;
 }
-void PigFarm::salePigs()
+void PigFarm::salePigs(int day)
 {
-    int blackPig=0,smallFlowerPig=0,bigWhightPig=0;
+    int blackPig=0,smallFlowerPig=0,bigWhitePig=0;
     double totalSalePrice=0;
     Pig*q;
     for(int i=0;i<PigFarm::totalPigStyNums;i++)
@@ -32,7 +32,7 @@ void PigFarm::salePigs()
                     totalSalePrice+=(q->getWeight()*Pig::salesPrice[1]);
                     break;
                     case 2:
-                    bigWhightPig++;
+                    bigWhitePig++;
                     totalSalePrice+=(q->getWeight()*Pig::salesPrice[2]);
                     break;
                 }
@@ -41,27 +41,35 @@ void PigFarm::salePigs()
             }
         }
     }
-    this->decreasePigNums(blackPig,smallFlowerPig,bigWhightPig);
-    cout<<"这次共卖出"<<blackPig<<"头黑猪      "<<smallFlowerPig<<"头小花猪       "<<bigWhightPig<<"头大白猪"<<endl;
-	cout<<"本次出圈的猪的总体售价为: "<<totalSalePrice<<"元"<<endl;
+    this->decreasePigNums(blackPig,smallFlowerPig,bigWhitePig);
+    ofstream ofs;
+    ofs.open("TemporaryPigSaleAndBuyInfo.txt",ios::out|ios::app);
+    if(!ofs) {
+		cout<<"打开销售记录文件失败"<<endl;
+		exit(0);
+	}
+    ofs<<'+'<<" "<<day<<" "<<blackPig<<" "<<smallFlowerPig<<" "<<bigWhitePig<<" "<<totalSalePrice<<endl;
+    ofs.close();
+    cout<<"这次共卖出"<<blackPig<<"头黑猪      "<<smallFlowerPig<<"头小花猪       "<<bigWhitePig<<"头大白猪"<<endl;
+	cout<<"本次出圈的猪的总体售价为: "<<std::fixed<<totalSalePrice<<"元"<<endl;
 }
 void PigFarm::print()
 {
-    cout<<"猪圈共有"<<this->totalPigNums<<"头猪"<<"黑猪"<<this->totalBlackPigNums<<"头 小花猪"<<this->totalSmallFlowerPigNums<<"头   ′大白猪"<<this->totalBigWhightPigNums<<"头"<<endl;
+    cout<<"猪圈共有"<<this->totalPigNums<<"头猪"<<"黑猪"<<this->totalBlackPigNums<<"头 小花猪"<<this->totalSmallFlowerPigNums<<"头   ′大白猪"<<this->totalBigWhitePigNums<<"头"<<endl;
 }
-void PigFarm::increasePigNums(int blackPig,int smallFlowerPig,int bigWhightPig)
+void PigFarm::increasePigNums(int blackPig,int smallFlowerPig,int bigWhitePig)
 {
-    this->totalPigNums+=(blackPig+smallFlowerPig+bigWhightPig);
+    this->totalPigNums+=(blackPig+smallFlowerPig+bigWhitePig);
     this->totalBlackPigNums+=blackPig;
     this->totalSmallFlowerPigNums+=smallFlowerPig;
-    this->totalBigWhightPigNums+=bigWhightPig;
+    this->totalBigWhitePigNums+=bigWhitePig;
 }
-void PigFarm::decreasePigNums(int blackPig,int smallFlowerPig,int bigWhightPig)
+void PigFarm::decreasePigNums(int blackPig,int smallFlowerPig,int bigWhitePig)
 {
-    this->totalPigNums-=(blackPig+smallFlowerPig+bigWhightPig);
+    this->totalPigNums-=(blackPig+smallFlowerPig+bigWhitePig);
     this->totalBlackPigNums-=blackPig;
     this->totalSmallFlowerPigNums-=smallFlowerPig;
-    this->totalBigWhightPigNums-=bigWhightPig;
+    this->totalBigWhitePigNums-=bigWhitePig;
 }
 void PigFarm::addPigsMenu()
 {
@@ -76,7 +84,7 @@ void PigFarm::addPigsMenu()
 		cout<<"\t\t----------------------------------------------------------\n";
 		cout<<endl<<"请输入您的选择："<<endl;
 }
-void PigFarm::deteAddPigNums(int &blackPig,int &smallFlowerPig,int &bigWhightPig,int &singlePigNum)
+void PigFarm::deteAddPigNums(int &blackPig,int &smallFlowerPig,int &bigWhitePig,int &singlePigNum)
 {
     int select=0;
     while(true)
@@ -90,8 +98,8 @@ void PigFarm::deteAddPigNums(int &blackPig,int &smallFlowerPig,int &bigWhightPig
         	srand((unsigned)time(NULL));
         	blackPig=rand()%(this->getSurplus()+1);
             smallFlowerPig=rand()%(this->getSurplus()-blackPig+1);
-            bigWhightPig=rand()%(this->getSurplus()-blackPig-smallFlowerPig+1);
-            cout<<endl<<"此次随机生成"<<blackPig<<"头黑猪      "<<smallFlowerPig<<"头小花猪         "<<bigWhightPig<<"头大白猪"<<endl;
+            bigWhitePig=rand()%(this->getSurplus()-blackPig-smallFlowerPig+1);
+            cout<<endl<<"此次随机生成"<<blackPig<<"头黑猪      "<<smallFlowerPig<<"头小花猪         "<<bigWhitePig<<"头大白猪"<<endl;
             break;
             case 2:
             	while(true)
@@ -101,8 +109,8 @@ void PigFarm::deteAddPigNums(int &blackPig,int &smallFlowerPig,int &bigWhightPig
 					 cout<<endl<<"请输入您要购入的小花猪的数量: ";
 	                cin>>smallFlowerPig;
 	                cout<<endl<<"请输入您要购入的大白猪的数量: ";
-	                cin>>bigWhightPig;
-	                if(blackPig+smallFlowerPig+bigWhightPig>this->getSurplus())
+	                cin>>bigWhitePig;
+	                if(blackPig+smallFlowerPig+bigWhitePig>this->getSurplus())
 	                {
 	                    cout<<endl<<"购入的数量太多，养猪场中无法装下这些猪，请重新输入";
 	                }
@@ -120,22 +128,22 @@ void PigFarm::deteAddPigNums(int &blackPig,int &smallFlowerPig,int &bigWhightPig
         bool hasSpace=false;
         for(int i=1;i<=PigSty::pigNumMax;i++)
         {
-            if((((this->totalSmallFlowerPigNums+this->totalBigWhightPigNums+smallFlowerPig+bigWhightPig)/i)+((this->totalBlackPigNums+blackPig)/i))>totalPigStyNums)
+            if((((this->totalSmallFlowerPigNums+this->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)/i)+((this->totalBlackPigNums+blackPig)/i))>totalPigStyNums)
             {
                 continue;
             }
             else
             {
-                if((this->totalBlackPigNums+blackPig)%i!=0&&(this->totalSmallFlowerPigNums+this->totalBigWhightPigNums+smallFlowerPig+bigWhightPig)%i!=0)
+                if((this->totalBlackPigNums+blackPig)%i!=0&&(this->totalSmallFlowerPigNums+this->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)%i!=0)
                 {
-                    if((((this->totalSmallFlowerPigNums+this->totalBigWhightPigNums+smallFlowerPig+bigWhightPig)/i)+((this->totalBlackPigNums+blackPig)/i))+2>totalPigStyNums)
+                    if((((this->totalSmallFlowerPigNums+this->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)/i)+((this->totalBlackPigNums+blackPig)/i))+2>totalPigStyNums)
                     {
                         continue;
                     }
                 }
-                else if((this->totalBlackPigNums+blackPig)%i!=0||(this->totalSmallFlowerPigNums+this->totalBigWhightPigNums+smallFlowerPig+bigWhightPig)%i!=0)
+                else if((this->totalBlackPigNums+blackPig)%i!=0||(this->totalSmallFlowerPigNums+this->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)%i!=0)
                 {
-                    if((((this->totalSmallFlowerPigNums+this->totalBigWhightPigNums+smallFlowerPig+bigWhightPig)/i)+((this->totalBlackPigNums+blackPig)/i))+1>totalPigStyNums)
+                    if((((this->totalSmallFlowerPigNums+this->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)/i)+((this->totalBlackPigNums+blackPig)/i))+1>totalPigStyNums)
                     {
                         continue;
                     }
@@ -314,10 +322,10 @@ void PigFarm::changePigDistribution(int blackPigStys)
     }
     this->flowerPigStyIndex=blackPigStys;
 }
-void PigFarm::addPigs()
+void PigFarm::addPigs(int day)
 {
-    int blackPig=0,smallFlowerPig=0,bigWhightPig=0,singlePigNum=0;
-    this->deteAddPigNums(blackPig,smallFlowerPig,bigWhightPig,singlePigNum);
+    int blackPig=0,smallFlowerPig=0,bigWhitePig=0,singlePigNum=0;
+    this->deteAddPigNums(blackPig,smallFlowerPig,bigWhitePig,singlePigNum);
 
     int extraBlackPigs=(this->totalBlackPigNums+blackPig)%singlePigNum;
     int oneLessNumBlackPigStys=(extraBlackPigs==0)?0:(singlePigNum-extraBlackPigs);
@@ -327,12 +335,19 @@ void PigFarm::addPigs()
     this->putPigIntoSty(blackPig,0,singlePigNum,oneLessNumBlackPigStys,blackPigStys,PigBreed::black,PigBreed::black);
 
 
-    int extraFlowerPigs=(this->totalSmallFlowerPigNums+this->totalBigWhightPigNums+smallFlowerPig+bigWhightPig)%singlePigNum;
+    int extraFlowerPigs=(this->totalSmallFlowerPigNums+this->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)%singlePigNum;
     int oneLessNumFlowerPigStys=(extraFlowerPigs==0)?0:(singlePigNum-extraFlowerPigs);
-    int FlowerPigStys=(extraFlowerPigs==0)?((this->totalSmallFlowerPigNums+this->totalBigWhightPigNums+smallFlowerPig+bigWhightPig)/singlePigNum):((this->totalSmallFlowerPigNums+this->totalBigWhightPigNums+smallFlowerPig+bigWhightPig)/singlePigNum+1);
-    this->putPigIntoSty(smallFlowerPig,bigWhightPig,singlePigNum,oneLessNumFlowerPigStys,FlowerPigStys,PigBreed::smallFlower,PigBreed::bigWhight);
-
-    this->increasePigNums(blackPig,smallFlowerPig,bigWhightPig);
+    int FlowerPigStys=(extraFlowerPigs==0)?((this->totalSmallFlowerPigNums+this->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)/singlePigNum):((this->totalSmallFlowerPigNums+this->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)/singlePigNum+1);
+    this->putPigIntoSty(smallFlowerPig,bigWhitePig,singlePigNum,oneLessNumFlowerPigStys,FlowerPigStys,PigBreed::smallFlower,PigBreed::bigWhite);
+	ofstream ofs;
+	ofs.open("TemporaryPigSaleAndBuyInfo.txt",ios::out|ios::app);
+	if(!ofs) {
+		cout<<"打开销售记录文件失败"<<endl;
+		exit(0);
+	}
+	ofs<<'-'<<" "<<day<<" "<<blackPig<<" "<<smallFlowerPig<<" "<<bigWhitePig<<endl;
+	ofs.close();
+    this->increasePigNums(blackPig,smallFlowerPig,bigWhitePig);
 }
 void PigFarm::pigFarmNextTime(int day)
 {
@@ -352,7 +367,7 @@ void PigFarm::printPigDistribution(PigBreed::Type breed,int lo,int hi)
 				cout<<"小花猪的数量："<<totalSmallFlowerPigNums; 
 				break;
 				case 2:
-					cout<<"大白猪的数量："<<totalBigWhightPigNums;
+					cout<<"大白猪的数量："<<totalBigWhitePigNums;
 					break;
 	}
 	cout<<"头"<<endl;
@@ -407,6 +422,6 @@ void PigFarm::printEachBreedDistribution()
 	
 	printPigDistribution(PigBreed::black,0,this->flowerPigStyIndex);
 	printPigDistribution(PigBreed::smallFlower,this->flowerPigStyIndex,PigFarm::totalPigStyNums);
-	printPigDistribution(PigBreed::bigWhight,this->flowerPigStyIndex,PigFarm::totalPigStyNums);
+	printPigDistribution(PigBreed::bigWhite,this->flowerPigStyIndex,PigFarm::totalPigStyNums);
 	
 }

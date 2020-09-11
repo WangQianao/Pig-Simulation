@@ -9,7 +9,7 @@ void PigSty::init()
     trailer->pred=header;
     trailer->succ=NULL;
     pigNum=0;
-    this->bigWhightPigNums=0;
+    this->bigWhitePigNums=0;
     this->blackPigNums=0;
     this->smallFlowerPigNums=0;
 }
@@ -20,7 +20,7 @@ PigSty::PigSty()
 void PigSty::print(int t)
 {
     cout<<"编号为"<<t<<"的猪圈现有"<<this->pigNum<<"头猪"<<endl;
-	cout<<"其中黑猪："<<this->blackPigNums<<"头    小花猪："<<this->smallFlowerPigNums<<"头    大白猪："<<this->bigWhightPigNums<<"头"<<endl;
+	cout<<"其中黑猪："<<this->blackPigNums<<"头    小花猪："<<this->smallFlowerPigNums<<"头    大白猪："<<this->bigWhitePigNums<<"头"<<endl;
 }
 void PigSty::increasePigNums(PigBreed::Type breed)
 {
@@ -29,7 +29,7 @@ void PigSty::increasePigNums(PigBreed::Type breed)
     {
         case 0: this->blackPigNums++;break;
         case 1: this->smallFlowerPigNums++;break;
-        case 2: this->bigWhightPigNums++;break;
+        case 2: this->bigWhitePigNums++;break;
     }
 }
 void PigSty::decreasePigNums(PigBreed::Type breed)
@@ -39,7 +39,7 @@ void PigSty::decreasePigNums(PigBreed::Type breed)
     {
         case 0: this->blackPigNums--;break;
         case 1: this->smallFlowerPigNums--;break;
-        case 2: this->bigWhightPigNums--;break;
+        case 2: this->bigWhitePigNums--;break;
     }
 }
 void PigSty::insert(Pig*p)

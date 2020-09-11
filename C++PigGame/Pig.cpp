@@ -1,4 +1,9 @@
 #include "pig.h"
+Pig::Pig()
+{
+	pred=NULL;
+    succ=NULL;
+}
 Pig::Pig(PigBreed::Type breed)
 {
     this->breed=breed;
@@ -34,16 +39,16 @@ void Pig::pigPrint()
 	switch(breed)
 	{
 		case 0:
-			cout<<"黑猪"<<endl;
+			cout<<"黑猪      ";
 			break;
 			case 1:
-				cout<<"小花猪"<<endl;
+				cout<<"小花猪      ";
 				break;
 			case 2:
-				cout<<"大白猪"<<endl;
+				cout<<"大白猪       ";
 				break;
 	}
-	cout<<"体重：  "<<weight<<"kg"<<endl;
-	cout<<"饲养时间："<<growDay<<"天"<<endl;
+	cout<<"体重:"<<weight<<"kg         ";
+	cout<<"饲养时间:"<<growDay<<"天"<<endl;
 	
 }

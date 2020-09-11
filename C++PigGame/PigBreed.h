@@ -5,7 +5,7 @@
 class PigBreed
 {
 public:
-    enum Type{black,smallFlower,bigWhight};
+    enum Type{black,smallFlower,bigWhite};
 
 };
 

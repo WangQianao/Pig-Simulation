@@ -5,6 +5,7 @@
 #include<stdlib.h>
 #include<time.h>
 #include<fstream>
+#include<iomanip>
 using namespace std;
 class Pig
 {
@@ -16,15 +17,18 @@ public:
     static constexpr int salesPrice[3]={30,14,12};
     Pig* pred;
     Pig* succ;
-    Pig(){}
+    Pig();
     Pig(PigBreed::Type breed);
-    PigBreed::Type getBreed(){return breed;}
     double getWeight(){return weight;}
+    void setWeight(double a){ weight=a;}
+    PigBreed::Type getBreed(){return breed;}
+    void setBreed(PigBreed::Type a){ breed=a;}
+    int getGrowDay(){return growDay;}
+	void setGrowDay(int a){ growDay=a;}
     void insert(PigBreed::Type breed);
     void insert(Pig*p);
 	void growWeight(int day); 
 	void pigNextTime(int day);
-	int getGrowDay(){return growDay;}
 	void pigPrint();
 };
 
