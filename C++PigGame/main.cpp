@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 		cin>>select;
 		switch(select) {
 			case 1://新的开始
-				delete pigFarm;//从后一个界面返回后重新开始 
+				delete pigFarm;//从后一个界面返回后重新开始  
 				pigFarm=new PigFarm;
 				clearFile("PigSaleAndBuyInfo.txt");
 				clearFile("PigGameInfo.txt");
@@ -34,6 +34,8 @@ int main(int argc, char** argv) {
 				playGame(pigFarm);
 				break;
 			case 2 :    //读取存档
+				delete pigFarm;//从后一个界面返回后清空养猪场 
+				pigFarm=new PigFarm;
 				system("cls");
 				cout<<"===================欢迎回到游戏======================="<<endl;
 				initializeGameByFile(pigFarm);
