@@ -12,8 +12,6 @@ class Pig
     PigBreed::Type breed;
     double weight;
     int growDay;
-    bool infected=false;
-    int infectedDay=0;
 public:
     static constexpr double weightMax=75;
     static constexpr int salesPrice[3]={30,14,12};
@@ -21,9 +19,6 @@ public:
     Pig* succ;
     Pig();
     Pig(PigBreed::Type breed);
-    bool isInfected(){return infected;}
-    int getInfectedDay(){return infectedDay;}
-
     double getWeight(){return weight;}
     void setWeight(double a){ weight=a;}
     PigBreed::Type getBreed(){return breed;}
@@ -38,4 +33,3 @@ public:
 };
 
 #endif // PIG_H
-
