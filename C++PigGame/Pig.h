@@ -21,6 +21,10 @@ public:
     Pig* succ;
     Pig();
     Pig(PigBreed::Type breed);
+    bool isInfected(){return infected};
+	int getInfectedDay(){return infectedDay;}
+	void setInfected(){infected=true};
+	void incInfectedDay(){ ++infectedDay;}
     double getWeight(){return weight;}
     void setWeight(double a){ weight=a;}
     PigBreed::Type getBreed(){return breed;}
