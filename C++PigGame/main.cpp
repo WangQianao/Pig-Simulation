@@ -10,8 +10,9 @@ void initializeGame(PigFarm*pigFarm);
 void readSaleAndBuyInfo();
 void clearFile(string filename);
 void copySaleFile();
-void saveGameInfo(PigFarm*pigFarm);
-bool initializeGameByFile(PigFarm*pigFarm);
+void saveGameInfo(string filename,PigFarm*pigFarm);
+bool initializeGameByFileAndPrint(string filename,PigFarm*pigFarm);
+void initializeGameByFile(string filename,PigFarm*pigFarm);
 void playGame(PigFarm*pigFarm);
 void feverSimulation(PigFarm*pigFarm);
 int gameDay=0;//游戏进行天数
@@ -38,7 +39,7 @@ int main(int argc, char** argv) {
 				delete pigFarm;//从后一个界面返回后清空养猪场 
 				pigFarm=new PigFarm;
 				system("cls");
-				if(initializeGameByFile(pigFarm))
+				if(initializeGameByFileAndPrint("PigGameInfo.txt",pigFarm))
 				{
 					system("pause");
 					playGame(pigFarm);
@@ -61,17 +62,83 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
+void initializeGameByFile(string filename,PigFarm*pigFarm)
+{
+	ifstream ifs;
+	ifs.open(filename,ios::in);
+	if(!ifs) {
+		cout<<"打开文件失败"<<endl;
+		exit(0);
+	}
+	char f;
+	ifs>>f;
+
+		int a,b,c,d,e;
+		double weight;
+		ifs>>a>>b;
+		gameDay=a;
+		lastSalePigDay=b;
+		ifs>>a>>b>>c>>d>>e;
+		pigFarm->setTotalPigNums(a);
+		pigFarm->setTotalBlackPigNums(b);
+		pigFarm->setTotalSmallFlowerPigNums(c);
+		pigFarm->setTotalBigWhitePigNums(d);
+		pigFarm->setFlowerPigStyIndex(e);
+		for(int i=0; i<PigFarm::totalPigStyNums; i++) {
+			ifs>>a>>b>>c>>d;
+			while(a--) {
+				Pig*p=new Pig;
+				ifs>>weight>>b>>c;
+				p->setWeight(weight);
+				p->setGrowDay(b);
+				switch(c) {
+					case 0:
+						p->setBreed(PigBreed::black);
+						break;
+					case 1:
+						p->setBreed(PigBreed::smallFlower);
+						break;
+					case 2:
+						p->setBreed(PigBreed::bigWhite);
+						break;
+				}
+				pigFarm->pigStys[i].insert(p);
+			}
+	
+		}
+
+	ifs.close();
+}
 void feverSimulation(PigFarm*pigFarm)
 {
+	saveGameInfo("TemporaryPigGameInfo.txt",pigFarm);
 	int pigStyIndex=0,pigIndex=0;
 	cout<<"现需要选择猪圈里的一头猪让其得猪瘟"<<endl;
-	cout<<"请输入猪圈的编号："<<endl;
+	cout<<"请输入猪圈的编号(0-99)："<<endl;
 	cin>>pigStyIndex;
-	cout<<"请输入猪的编号："<<endl;
-	cin>>pigIndex;
-	cout<<"模拟猪瘟的扩展几率为，同一个猪圈的猪每天被传染几率是50%，相邻猪圈的猪每天被传染的几率是15%，不相邻的猪圈的猪不传染"<<endl;
-	cout<<"假定一只猪从感染猪瘟到死亡需要七天"<<endl;
-	cout<<"经过模拟，该猪得猪瘟后，如果不采取任何措施, "<<pigFarm->fever(pigStyIndex,pigIndex)<<" 天后养猪场的猪便会死光"<<endl;
+	cout<<"该猪圈有"<<pigFarm->pigStys[pigStyIndex].getPigNum()<<"头猪"<<endl;
+	cout<<"请输入猪的编号(0-"<<pigFarm->pigStys[pigStyIndex].getPigNum()-1<<")："<<endl;
+	while(true)
+	{
+		cin>>pigIndex;
+		if(pigIndex>=0&&pigIndex<pigFarm->pigStys[pigStyIndex].getPigNum())
+		{
+			cout<<"模拟猪瘟的扩展几率为，同一个猪圈的猪每天被传染几率是50%，相邻猪圈的猪每天被传染的几率是15%，不相邻的猪圈的猪不传染"<<endl;
+			cout<<"假定一只猪从感染猪瘟到死亡需要七天"<<endl;
+			cout<<"经过模拟，该猪得猪瘟后，如果不采取任何措施, "<<pigFarm->fever(pigStyIndex,pigIndex)<<" 天后养猪场的猪便会死光"<<endl;
+			initializeGameByFile("TemporaryPigGameInfo.txt",pigFarm);
+			break;
+		}
+		else
+		{
+			cout<<"请重新输入猪的编号"<<endl; 
+			system("pause");
+		}
+		
+		
+	}
+	system("pause");
+	
 }
 void playGame(PigFarm*pigFarm) {
 	while(true) {
@@ -183,7 +250,7 @@ void playGame(PigFarm*pigFarm) {
 					break; 
 				case 5://保存游戏
 					copySaleFile();
-					saveGameInfo(pigFarm);
+					saveGameInfo("PigGameInfo.txt",pigFarm);
 
 					break;
 				case 6://退回游戏主界面(不会自动保存)
@@ -201,10 +268,10 @@ void playGame(PigFarm*pigFarm) {
 
 
 }
-bool initializeGameByFile(PigFarm*pigFarm) {
+bool initializeGameByFileAndPrint(string filename,PigFarm*pigFarm) {
 	ifstream ifs;
 	bool flag=true;
-	ifs.open("PigGameInfo.txt",ios::in);
+	ifs.open(filename,ios::in);
 	if(!ifs) {
 		cout<<"打开文件失败"<<endl;
 		exit(0);
@@ -324,9 +391,9 @@ void readSaleAndBuyInfo() {
 	ifs.close();
 
 }
-void saveGameInfo(PigFarm*pigFarm) {
+void saveGameInfo(string filename,PigFarm*pigFarm) {
 	ofstream ofs;
-	ofs.open("PigGameInfo.txt",ios::out);
+	ofs.open(filename,ios::out);
 	if(!ofs) {
 		cout<<"打开文件失败"<<endl;
 		exit(0);

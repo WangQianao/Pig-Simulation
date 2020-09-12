@@ -331,10 +331,10 @@ void PigFarm::printPigDistribution(PigBreed::Type breed,int lo,int hi) {
 	cout<<pigNum<<"Í·"<<endl;
 }
 int PigFarm::fever(int pigStyIndex,int pigIndex) {
-	int day=1;
+	int day=1,deadPigNum=0;
 	this->pigStys[pigStyIndex][pigIndex].infected=true;
 	this->pigStys[pigStyIndex][pigIndex].infectedDay++;
-	while(this->totalPigNums!=0) {
+	while(this->totalPigNums!=deadPigNum) {
 		for(int i=0; i<PigFarm::totalPigStyNums; i++) {
 			for(Pig*p=this->pigStys[i].first(); p!=this->pigStys[i].last()->succ; p=p->succ) {
 				if(p->infected&&p->infectedDay>0) {
@@ -361,7 +361,8 @@ int PigFarm::fever(int pigStyIndex,int pigIndex) {
 						for(Pig*q=this->pigStys[i+1].first(); q!=this->pigStys[i+1].last()->succ; q=q->succ) {
 							if(q->infected)continue;
 							else {
-								if(rand()%20==1||rand()%20==2||rand()%20==2) { //%15¸ÅÂÊ
+								int t=rand()%20;
+								if(t==1||t==2||t==3) { //%15¸ÅÂÊ
 									q->infected=true;
 								}
 							}
@@ -370,36 +371,35 @@ int PigFarm::fever(int pigStyIndex,int pigIndex) {
 				}
 			}
 		}
+		Pig*q;
 		for(int i=0; i<PigFarm::totalPigStyNums; i++)
 		{
 			for(Pig*p=this->pigStys[i].first(); p!=this->pigStys[i].last()->succ; p=p->succ)
 			{
-				p->infectedDay++;
-				if(p->infectedDay>=7)
+				if(p->infected)
 				{
-					p=this->pigStys[i].removePig(p);
-					delete p;
+					p->infectedDay++;
+					if(p->infectedDay>=7)
+					{
+						q=p;
+						p=p->pred;
+						q=this->pigStys[i].removePig(q);
+						delete q;
+						deadPigNum++;
+						
+					}
 				}
+			
 				
 			}
 		}
 		day++;
-
+	
 	}
-     this->renewPigFever();
+     
 	return day;
 }
-void PigFarm::renewPigFever()
-{
-	for(int i=0;i<PigFarm::totalPigStyNums;i++)
-	{
-		for(Pig*p=this->pigStys[i].first(); p!=this->pigStys[i].last()->succ; p=p->succ)
-		{
-			p->infected=false;
-			p->infectedDay=0;
-		}
-	}
-}
+
 void PigFarm::printEachBreedDistribution() {
 
 	printPigDistribution(PigBreed::black,0,this->flowerPigStyIndex);

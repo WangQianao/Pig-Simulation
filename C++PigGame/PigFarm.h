@@ -37,7 +37,6 @@ public:
 	void printEachBreedDistribution();
 	void printPigDistribution(PigBreed::Type breed,int lo,int hi);
 	int fever(int pigStyIndex,int pigIndex);
-	void renewPigFever();
 };
 
 #endif // PIGFARM_H
