@@ -12,7 +12,10 @@ class Pig
     PigBreed::Type breed;
     double weight;
     int growDay;
+ 	 
 public:
+	bool infected=false;
+    int infectedDay=0;
     static constexpr double weightMax=75;
     static constexpr int salesPrice[3]={30,14,12};
     Pig* pred;
@@ -33,4 +36,3 @@ public:
 };
 
 #endif // PIG_H
-

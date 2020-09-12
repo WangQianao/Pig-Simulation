@@ -36,6 +36,7 @@ public:
 	void pigFarmNextTime(int day);
 	void printEachBreedDistribution();
 	void printPigDistribution(PigBreed::Type breed,int lo,int hi);
+	int fever(int pigStyIndex,int pigIndex);
 };
 
 #endif // PIGFARM_H

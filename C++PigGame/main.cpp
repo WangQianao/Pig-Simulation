@@ -1,5 +1,4 @@
-
-/* run this program using the console pauser or add your own getch, system("pause") or input loop */
+/*run this program using the console pauser or add your own getch, system("pause") or input loop */
 #include "Pig.h"
 #include "PigSty.h"
 #include "PigFarm.h"
@@ -11,21 +10,25 @@ void initializeGame(PigFarm*pigFarm);
 void readSaleAndBuyInfo();
 void clearFile(string filename);
 void copySaleFile();
-void saveGameInfo(PigFarm*pigFarm);
-void initializeGameByFile(PigFarm*pigFarm);
+void saveGameInfo(string filename,PigFarm*pigFarm);
+bool initializeGameByFileAndPrint(string filename,PigFarm*pigFarm);
+void initializeGameByFile(string filename,PigFarm*pigFarm);
 void playGame(PigFarm*pigFarm);
+void feverSimulation(PigFarm*pigFarm);
 int gameDay=0;//游戏进行天数
 int lastSalePigDay=0;//上次猪出圈的日期
 int main(int argc, char** argv) {
 	srand((unsigned)time(NULL));
 	int select=0;
-	PigFarm *pigFarm=new PigFarm;
+    PigFarm *pigFarm=NULL;
 	clearFile("TemporaryPigSaleAndBuyInfo.txt");
 	while(true) {
 		mainMenu();
 		cin>>select;
 		switch(select) {
 			case 1://新的开始
+				delete pigFarm;		//从后一个界面返回后重新开始  
+				pigFarm=new PigFarm;
 				clearFile("PigSaleAndBuyInfo.txt");
 				clearFile("PigGameInfo.txt");
 				system("cls");
@@ -33,11 +36,18 @@ int main(int argc, char** argv) {
 				playGame(pigFarm);
 				break;
 			case 2 :    //读取存档
+				delete pigFarm;//从后一个界面返回后清空养猪场 
+				pigFarm=new PigFarm;
 				system("cls");
-				cout<<"===================欢迎回到游戏======================="<<endl;
-				initializeGameByFile(pigFarm);
-				system("pause");
-				playGame(pigFarm);
+				if(initializeGameByFileAndPrint("PigGameInfo.txt",pigFarm))
+				{
+					system("pause");
+					playGame(pigFarm);
+				}
+				else
+				{
+					system("pause");
+				}
 				break;
 			case 3 :    //退出
 				return 0;
@@ -51,6 +61,84 @@ int main(int argc, char** argv) {
 	}
 
 	return 0;
+}
+void initializeGameByFile(string filename,PigFarm*pigFarm)
+{
+	ifstream ifs;
+	ifs.open(filename,ios::in);
+	if(!ifs) {
+		cout<<"打开文件失败"<<endl;
+		exit(0);
+	}
+	char f;
+	ifs>>f;
+
+		int a,b,c,d,e;
+		double weight;
+		ifs>>a>>b;
+		gameDay=a;
+		lastSalePigDay=b;
+		ifs>>a>>b>>c>>d>>e;
+		pigFarm->setTotalPigNums(a);
+		pigFarm->setTotalBlackPigNums(b);
+		pigFarm->setTotalSmallFlowerPigNums(c);
+		pigFarm->setTotalBigWhitePigNums(d);
+		pigFarm->setFlowerPigStyIndex(e);
+		for(int i=0; i<PigFarm::totalPigStyNums; i++) {
+			ifs>>a>>b>>c>>d;
+			while(a--) {
+				Pig*p=new Pig;
+				ifs>>weight>>b>>c;
+				p->setWeight(weight);
+				p->setGrowDay(b);
+				switch(c) {
+					case 0:
+						p->setBreed(PigBreed::black);
+						break;
+					case 1:
+						p->setBreed(PigBreed::smallFlower);
+						break;
+					case 2:
+						p->setBreed(PigBreed::bigWhite);
+						break;
+				}
+				pigFarm->pigStys[i].insert(p);
+			}
+	
+		}
+
+	ifs.close();
+}
+void feverSimulation(PigFarm*pigFarm)
+{
+	saveGameInfo("TemporaryPigGameInfo.txt",pigFarm);
+	int pigStyIndex=0,pigIndex=0;
+	cout<<"现需要选择猪圈里的一头猪让其得猪瘟"<<endl;
+	cout<<"请输入猪圈的编号(0-99)："<<endl;
+	cin>>pigStyIndex;
+	cout<<"该猪圈有"<<pigFarm->pigStys[pigStyIndex].getPigNum()<<"头猪"<<endl;
+	cout<<"请输入猪的编号(0-"<<pigFarm->pigStys[pigStyIndex].getPigNum()-1<<")："<<endl;
+	while(true)
+	{
+		cin>>pigIndex;
+		if(pigIndex>=0&&pigIndex<pigFarm->pigStys[pigStyIndex].getPigNum())
+		{
+			cout<<"模拟猪瘟的扩展几率为，同一个猪圈的猪每天被传染几率是50%，相邻猪圈的猪每天被传染的几率是15%，不相邻的猪圈的猪不传染"<<endl;
+			cout<<"假定一只猪从感染猪瘟到死亡需要七天"<<endl;
+			cout<<"经过模拟，该猪得猪瘟后，如果不采取任何措施, "<<pigFarm->fever(pigStyIndex,pigIndex)<<" 天后养猪场的猪便会死光"<<endl;
+			initializeGameByFile("TemporaryPigGameInfo.txt",pigFarm);
+			break;
+		}
+		else
+		{
+			cout<<"请重新输入猪的编号"<<endl; 
+			system("pause");
+		}
+		
+		
+	}
+	system("pause");
+	
 }
 void playGame(PigFarm*pigFarm) {
 	while(true) {
@@ -157,12 +245,15 @@ void playGame(PigFarm*pigFarm) {
 				case 3://进入下一个月
 					nextTime(30,pigFarm);
 					break;
-				case 4://保存游戏
+					case 4://猪瘟模拟
+					feverSimulation(pigFarm);
+					break; 
+				case 5://保存游戏
 					copySaleFile();
-					saveGameInfo(pigFarm);
+					saveGameInfo("PigGameInfo.txt",pigFarm);
 
 					break;
-				case 5://退回游戏主界面(不会自动保存)
+				case 6://退回游戏主界面(不会自动保存)
 					exitFlag=true;
 					break;
 				default:
@@ -177,55 +268,68 @@ void playGame(PigFarm*pigFarm) {
 
 
 }
-void initializeGameByFile(PigFarm*pigFarm) {
+bool initializeGameByFileAndPrint(string filename,PigFarm*pigFarm) {
 	ifstream ifs;
-	ifs.open("PigGameInfo.txt",ios::in);
+	bool flag=true;
+	ifs.open(filename,ios::in);
 	if(!ifs) {
 		cout<<"打开文件失败"<<endl;
 		exit(0);
 	}
-	int a,b,c,d,e;
-	double weight;
-	ifs>>a>>b;
-	gameDay=a;
-	lastSalePigDay=b;
-	cout<<"游戏进行到第"<<gameDay<<"天"<<endl;
-	ifs>>a>>b>>c>>d>>e;
-	pigFarm->setTotalPigNums(a);
-	pigFarm->setTotalBlackPigNums(b);
-	pigFarm->setTotalSmallFlowerPigNums(c);
-	pigFarm->setTotalBigWhitePigNums(d);
-	pigFarm->setFlowerPigStyIndex(e);
-	cout<<"当前养猪场共有"<<a<<"头猪    "<<b<<"头黑猪     "<<c<<"头小花猪     "<<d<<"头大白猪"<<endl;
-	for(int i=0; i<PigFarm::totalPigStyNums; i++) {
-		ifs>>a>>b>>c>>d;
-		cout<<"************************编号为"<<i<<"的猪圈*************************************"<<endl;
-		cout<<"共"<<b<<"头黑猪   "<<c<<"头小花猪    "<<d<<"头大白猪"<<endl;
-		int index=0;
-		while(a--) {
-			Pig*p=new Pig;
-			ifs>>weight>>b>>c;
-			p->setWeight(weight);
-			p->setGrowDay(b);
-			switch(c) {
-				case 0:
-					p->setBreed(PigBreed::black);
-					break;
-				case 1:
-					p->setBreed(PigBreed::smallFlower);
-					break;
-				case 2:
-					p->setBreed(PigBreed::bigWhite);
-					break;
-			}
-			cout<<"编号:"<<index<<"  ";
-			p->pigPrint();
-			pigFarm->pigStys[i].insert(p);
-			index++;
-		}
-
+	char c;
+	ifs>>c;
+	if(ifs.eof())
+	{
+		cout<<"当前无存档"<<endl;
+		flag=false;
 	}
+	else
+	{
+		int a,b,c,d,e;
+		double weight;
+		ifs>>a>>b;
+		gameDay=a;
+		lastSalePigDay=b;
+		cout<<"游戏进行到第"<<gameDay<<"天"<<endl;
+		ifs>>a>>b>>c>>d>>e;
+		pigFarm->setTotalPigNums(a);
+		pigFarm->setTotalBlackPigNums(b);
+		pigFarm->setTotalSmallFlowerPigNums(c);
+		pigFarm->setTotalBigWhitePigNums(d);
+		pigFarm->setFlowerPigStyIndex(e);
+		cout<<"当前养猪场共有"<<a<<"头猪    "<<b<<"头黑猪     "<<c<<"头小花猪     "<<d<<"头大白猪"<<endl;
+		for(int i=0; i<PigFarm::totalPigStyNums; i++) {
+			ifs>>a>>b>>c>>d;
+			cout<<"************************编号为"<<i<<"的猪圈*************************************"<<endl;
+			cout<<"共"<<b<<"头黑猪   "<<c<<"头小花猪    "<<d<<"头大白猪"<<endl;
+			int index=0;
+			while(a--) {
+				Pig*p=new Pig;
+				ifs>>weight>>b>>c;
+				p->setWeight(weight);
+				p->setGrowDay(b);
+				switch(c) {
+					case 0:
+						p->setBreed(PigBreed::black);
+						break;
+					case 1:
+						p->setBreed(PigBreed::smallFlower);
+						break;
+					case 2:
+						p->setBreed(PigBreed::bigWhite);
+						break;
+				}
+				cout<<"编号:"<<index<<"  ";
+				p->pigPrint();
+				pigFarm->pigStys[i].insert(p);
+				index++;
+			}
+	
+		}
+	}
+
 	ifs.close();
+	return flag;
 }
 void copySaleFile() {
 	ifstream ifs("TemporaryPigSaleAndBuyInfo.txt",ios::in);
@@ -287,13 +391,14 @@ void readSaleAndBuyInfo() {
 	ifs.close();
 
 }
-void saveGameInfo(PigFarm*pigFarm) {
+void saveGameInfo(string filename,PigFarm*pigFarm) {
 	ofstream ofs;
-	ofs.open("PigGameInfo.txt",ios::out);
+	ofs.open(filename,ios::out);
 	if(!ofs) {
 		cout<<"打开文件失败"<<endl;
 		exit(0);
 	}
+	ofs<<'#'<<" ";
 	ofs<<gameDay<<" "<<lastSalePigDay<<endl;
 	ofs<<pigFarm->getTotalPigNums()<<" "<<pigFarm->getTotalBlackPigNums()<<" "<<pigFarm->getTotalSmallFlowerPigNums()<<" "<<pigFarm->getTotalBigWhitePigNums()<<" "<<pigFarm->getFlowerPigStyIndex()<<endl;
 	for(int i=0; i<PigFarm::totalPigStyNums; i++) {
@@ -338,7 +443,6 @@ void initializeGame(PigFarm*pigFarm) {
 	cout<<"现在请为养猪场添加第一批猪崽"<<endl;
 	system("pause");
 	pigFarm->addPigs(gameDay);
-
 }
 void gameMenu() {
 	cout<<"========================养猪场==================================";
@@ -352,9 +456,11 @@ void gameMenu() {
 	cout<<"\t\t|                                                         |\n";
 	cout<<"\t\t|                  3.  进入下一个月                       |\n";
 	cout<<"\t\t|                                                         |\n";
-	cout<<"\t\t|                  4.  保存游戏                           |\n";
+	cout<<"\t\t|                  4.  猪瘟模拟                           |\n";
 	cout<<"\t\t|                                                         |\n";
-	cout<<"\t\t|                  5.  退回游戏主界面(不会自动保存)       |\n";
+	cout<<"\t\t|                  5.  保存游戏                           |\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t|                  6.  退回游戏主界面(不会自动保存)       |\n";
 	cout<<"\t\t|                                                         |\n";
 	cout<<"\t\t----------------现在是第"<<gameDay<<"天------------------------------------------\n";
 

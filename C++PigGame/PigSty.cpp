@@ -2,8 +2,8 @@
 using namespace std;
 void PigSty::init()
 {
-    header=new Pig(PigBreed::black);
-    trailer=new Pig(PigBreed::black);
+    header=new Pig;
+    trailer=new Pig;
     header->succ=trailer;
     header->pred=NULL;
     trailer->pred=header;
@@ -48,6 +48,7 @@ void PigSty::insert(Pig*p)
 }
 void PigSty::insert(PigBreed::Type breed)
 {
+
     this->last()->insert(breed);
     this->increasePigNums(breed);
 }
