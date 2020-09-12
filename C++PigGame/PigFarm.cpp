@@ -120,9 +120,10 @@ void PigFarm::deteAddPigNums(int &blackPig,int &smallFlowerPig,int &bigWhitePig,
 	                }
 	            }
             	break;
-            	default:
+            default:
             		cout<<"输入错误，请重新进行选择"<<endl;
             		system("pause");
+            		continue;
             		break;
 		}
         bool hasSpace=false;
