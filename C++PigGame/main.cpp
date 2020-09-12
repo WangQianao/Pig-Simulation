@@ -18,14 +18,14 @@ int lastSalePigDay=0;//上次猪出圈的日期
 int main(int argc, char** argv) {
 	srand((unsigned)time(NULL));
 	int select=0;
-    PigFarm *pigFarm=new PigFarm;
+    PigFarm *pigFarm;
 	clearFile("TemporaryPigSaleAndBuyInfo.txt");
 	while(true) {
 		mainMenu();
 		cin>>select;
 		switch(select) {
 			case 1://新的开始
-				delete pigFarm;//从后一个界面返回后重新开始  
+				delete pigFarm;		//从后一个界面返回后重新开始  
 				pigFarm=new PigFarm;
 				clearFile("PigSaleAndBuyInfo.txt");
 				clearFile("PigGameInfo.txt");
