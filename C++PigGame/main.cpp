@@ -18,7 +18,7 @@ int lastSalePigDay=0;//上次猪出圈的日期
 int main(int argc, char** argv) {
 	srand((unsigned)time(NULL));
 	int select=0;
-    PigFarm *pigFarm;
+    PigFarm *pigFarm=NULL;
 	clearFile("TemporaryPigSaleAndBuyInfo.txt");
 	while(true) {
 		mainMenu();
@@ -160,12 +160,15 @@ void playGame(PigFarm*pigFarm) {
 				case 3://进入下一个月
 					nextTime(30,pigFarm);
 					break;
-				case 4://保存游戏
+					case 4://猪瘟模拟
+					
+					break; 
+				case 5://保存游戏
 					copySaleFile();
 					saveGameInfo(pigFarm);
 
 					break;
-				case 5://退回游戏主界面(不会自动保存)
+				case 6://退回游戏主界面(不会自动保存)
 					exitFlag=true;
 					break;
 				default:
@@ -355,9 +358,11 @@ void gameMenu() {
 	cout<<"\t\t|                                                         |\n";
 	cout<<"\t\t|                  3.  进入下一个月                       |\n";
 	cout<<"\t\t|                                                         |\n";
-	cout<<"\t\t|                  4.  保存游戏                           |\n";
+	cout<<"\t\t|                  4.  猪瘟模拟                           |\n";
 	cout<<"\t\t|                                                         |\n";
-	cout<<"\t\t|                  5.  退回游戏主界面(不会自动保存)       |\n";
+	cout<<"\t\t|                  5.  保存游戏                           |\n";
+	cout<<"\t\t|                                                         |\n";
+	cout<<"\t\t|                  6.  退回游戏主界面(不会自动保存)       |\n";
 	cout<<"\t\t|                                                         |\n";
 	cout<<"\t\t----------------现在是第"<<gameDay<<"天------------------------------------------\n";
 
