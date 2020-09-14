@@ -50,6 +50,9 @@ FORMS += \
         mainsence.ui \
     addpigwidget.ui
 
+RESOURCES += \
+    rsc.qrc
+
 
 
 

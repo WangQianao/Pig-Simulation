@@ -18,13 +18,13 @@ public:
     ~MainSence();
     GameMenu * gameMenu = NULL;
     PigFarm * pigFarm = new PigFarm;
-    //void initializeGameByFile(QString filename,PigFarm*pigFarm);
     bool initializeGameByFileAndPrint(QString filename,PigFarm*pigFarm);
     void initializeGameByFile(QString filename,PigFarm*pigFarm);
     void clearFile(QString filename);
     void feverSimulation(PigFarm*pigFarm);
-     void copySaleFile();
-     void saveGameInfo(QString filename,PigFarm*pigFarm);
+    void copySaleFile();
+    void saveGameInfo(QString filename,PigFarm*pigFarm);
+    void paintEvent(QPaintEvent *event);
 private:
     Ui::MainSence *ui;
 };

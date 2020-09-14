@@ -8,10 +8,13 @@
 #include "drawgraph.h"
 #include <QWidget>
 #include <QTextEdit>
+#include <QPainter>
+#include <QPixmap>
 CheckMenu::CheckMenu(PigFarm*pigFarm, QWidget *parent) : QMainWindow(parent)
 {
     //设置窗口固定大小
-    this->setFixedSize(320,588);
+    this->setFixedSize(600,600);
+    this->setWindowIcon(QPixmap(":/new/prefix1/PigIcon.png"));
     //设置标题
     this->setWindowTitle("查询窗口");
     //设置查询某一猪圈的猪的数量和种类的按钮
@@ -21,11 +24,12 @@ CheckMenu::CheckMenu(PigFarm*pigFarm, QWidget *parent) : QMainWindow(parent)
     connect(checkStyButton,&QPushButton::clicked,[=](){
 
 
-                       int Styindex=QInputDialog::getInt(this,"查询猪圈状态","请输入猪圈的编号(0-99)",0,0,99);
-                            QMessageBox msgBox;
-                            msgBox.setIcon(QMessageBox::Information);
-                             msgBox.setText(pigFarm->pigStys[Styindex].print(Styindex));
-                             msgBox.exec();
+        int Styindex=QInputDialog::getInt(this,"查询猪圈状态","请输入猪圈的编号(0-99)",0,0,99);
+        //使用QMessageBox来显示猪圈信息
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText(pigFarm->pigStys[Styindex].print(Styindex));
+        msgBox.exec();
 
     });
 
@@ -35,23 +39,24 @@ CheckMenu::CheckMenu(PigFarm*pigFarm, QWidget *parent) : QMainWindow(parent)
     checkPigButton->move(this->width()*0.5-checkPigButton->width()*0.5,this->height()*0.25);
     connect(checkPigButton,&QPushButton::clicked,[=](){
 
-                    int styIndex=QInputDialog::getInt(this,"查询某一头猪的状态","请输入猪圈的编号(0-99)",0,0,99);
-                    if(pigFarm->pigStys[styIndex].getPigNum()==0)
-                    {
-                        QMessageBox msgBox;
-                        msgBox.setIcon(QMessageBox::Information);
-                         msgBox.setText("该猪圈一头猪都没有,故无法查询");
-                         msgBox.exec();
-                    }
-                    else
-                    {
-                        QString t = QString("请输入猪的编号(0- %1 )").arg(pigFarm->pigStys[styIndex].getPigNum()-1);
-                         int pigIndex=QInputDialog::getInt(this,"查询某一头猪的状态",t,0,0,pigFarm->pigStys[styIndex].getPigNum()-1);
-                          QMessageBox msgBox;
-                          msgBox.setIcon(QMessageBox::Information);
-                          msgBox.setText(pigFarm->pigStys[styIndex][pigIndex].pigPrint());
-                          msgBox.exec();
-                    }
+        int styIndex=QInputDialog::getInt(this,"查询某一头猪的状态","请输入猪圈的编号(0-99)",0,0,99);
+        if(pigFarm->pigStys[styIndex].getPigNum()==0)
+        {
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.setText("该猪圈一头猪都没有,故无法查询");
+            msgBox.exec();
+        }
+        else
+        {
+            QString t = QString("请输入猪的编号(0- %1 )").arg(pigFarm->pigStys[styIndex].getPigNum()-1);
+            int pigIndex=QInputDialog::getInt(this,"查询某一头猪的状态",t,0,0,pigFarm->pigStys[styIndex].getPigNum()-1);
+            //使用QMessageBox来显示猪的信息
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.setText(pigFarm->pigStys[styIndex][pigIndex].pigPrint());
+            msgBox.exec();
+        }
 
 
 
@@ -62,36 +67,36 @@ CheckMenu::CheckMenu(PigFarm*pigFarm, QWidget *parent) : QMainWindow(parent)
     checkDisButton->setFixedSize(200,50);
     checkDisButton->move(this->width()*0.5-checkDisButton->width()*0.5,this->height()*0.4);
     connect(checkDisButton,&QPushButton::clicked,[=](){
+        //让用户选择查询哪个品种猪的分布
+        QStringList items;
+        items << "黑猪" << "小花猪" << "大白猪";
+        bool ok;
+        QInputDialog in ;
 
-                 QStringList items;
-                 items << "黑猪" << "小花猪" << "大白猪";
-                 bool ok;
-                 QInputDialog in ;
+        QString item = in.getItem(this, "请选择品种",
+                                  "品种:", items, 0, false, &ok);
+        if (ok && !item.isEmpty())
+        {
 
-                 QString item = in.getItem(this, "请选择品种",
-                                                      "品种:", items, 0, false, &ok);
-                 if (ok && !item.isEmpty())
-                 {
+            if(item==items[0])
+            {
+                pigFarm->eachBreedDis(PigBreed::black,0,pigFarm->flowerPigStyIndex);
 
-                     if(item==items[0])
-                     {
-                         pigFarm->eachBreedDis(PigBreed::black,0,pigFarm->flowerPigStyIndex);
+            }
+            else if(item==items[1])
+            {
 
-                     }
-                     else if(item==items[1])
-                     {
+                pigFarm->eachBreedDis(PigBreed::smallFlower,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
+            }else
+            {
 
-                        pigFarm->eachBreedDis(PigBreed::smallFlower,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
-                     }else
-                     {
-
-                       pigFarm->eachBreedDis(PigBreed::bigWhite,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
-                     }
-
-
+                pigFarm->eachBreedDis(PigBreed::bigWhite,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
+            }
 
 
-                    }
+
+
+        }
 
     });
     //设置查询销售和购入记录的按钮
@@ -100,7 +105,7 @@ CheckMenu::CheckMenu(PigFarm*pigFarm, QWidget *parent) : QMainWindow(parent)
     checkSaleAndBuyButton->move(this->width()*0.5-checkSaleAndBuyButton->width()*0.5,this->height()*0.55);
     connect(checkSaleAndBuyButton,&QPushButton::clicked,[=](){
 
-         readSaleAndBuyInfo();
+        readSaleAndBuyInfo();
 
 
 
@@ -114,13 +119,24 @@ CheckMenu::CheckMenu(PigFarm*pigFarm, QWidget *parent) : QMainWindow(parent)
     connect(exitButton,&QPushButton::clicked,[=](){
 
 
-                   this->hide();
-            //触发自定义信号，关闭自身，该信号写到 signals下做声明
-                emit this->checkMenuBack();
+        this->hide();
+        //触发自定义信号，关闭自身，该信号写到 signals下做声明
+        emit this->checkMenuBack();
 
 
     });
 
+}
+void CheckMenu::paintEvent(QPaintEvent *event)
+{
+    //创建画家，指定绘图设备
+    QPainter painter(this);
+    //创建QPixmap对象
+    QPixmap pix;
+    //加载图片
+    pix.load(":/new/prefix1/piggame1.png");
+    //绘制背景图
+    painter.drawPixmap(0,0,this->width(),this->height(),pix);
 }
 void CheckMenu::readSaleAndBuyInfo()
 {
@@ -130,67 +146,67 @@ void CheckMenu::readSaleAndBuyInfo()
     edit->setFixedSize(wid->width(),wid->height());
     readInfo(edit,"PigSaleAndBuyInfo.txt");
     readInfo(edit,"TemporaryPigSaleAndBuyInfo.txt");
-         wid->show();
-         edit->show();
+    wid->show();
+    edit->show();
 
 }
- void CheckMenu::readInfo( QTextEdit * edit,QString filename)
- {
-     QFile ifs(filename);
-     if(!ifs.open(QIODevice::ReadOnly|QIODevice::Text))
-     {
-         QMessageBox msgBox;
-         msgBox.setIcon(QMessageBox::Critical);
-         msgBox.setText("打开文件失败");
-         msgBox.exec();
-         exit(0);
-     }
-     int day,blackPig,smallFlowerPig,bigWhitePig;
-     double price;
-     QTextStream in(&ifs);
-          while (!in.atEnd()) {
-              QString line = in.readLine();
-              if(line[0]=='+')
-              {
-                  line.remove(0,2);
-                  QStringList list2 = line.split(' ', QString::SkipEmptyParts);
+void CheckMenu::readInfo( QTextEdit * edit,QString filename)
+{
+    QFile ifs(filename);
+    if(!ifs.open(QIODevice::ReadOnly|QIODevice::Text))
+    {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText("打开文件失败");
+        msgBox.exec();
+        exit(0);
+    }
+    int day,blackPig,smallFlowerPig,bigWhitePig;
+    double price;
+    QTextStream in(&ifs);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        if(line[0]=='+')
+        {
+            line.remove(0,2);
+            QStringList list2 = line.split(' ', QString::SkipEmptyParts);
 
-                  QString s= list2[0];
-                  day=s.toInt(0);
-                  s= list2[1];
-                  blackPig=s.toInt();
-                  s= list2[2];
-                  smallFlowerPig=s.toInt();
-                   s= list2[3];
-                   bigWhitePig=s.toInt();
-                    s=list2[4];
-                    price=s.toDouble();
+            QString s= list2[0];
+            day=s.toInt(0);
+            s= list2[1];
+            blackPig=s.toInt();
+            s= list2[2];
+            smallFlowerPig=s.toInt();
+            s= list2[3];
+            bigWhitePig=s.toInt();
+            s=list2[4];
+            price=s.toDouble();
 
-                  s=QString("在第%1天,卖出%2头黑猪,%3头小花猪,%4头大白猪,总售价%5元").arg(day).arg(blackPig).arg(smallFlowerPig).arg(bigWhitePig).arg(QString::number(price,'f',1));
-                 edit->append(s);
+            s=QString("在第%1天,卖出%2头黑猪,%3头小花猪,%4头大白猪,总售价%5元").arg(day).arg(blackPig).arg(smallFlowerPig).arg(bigWhitePig).arg(QString::number(price,'f',1));
+            edit->append(s);
 
-              }
-              else
-              {
-                  line.remove(0,2);
-                  QStringList list2 = line.split(' ', QString::SkipEmptyParts);
+        }
+        else
+        {
+            line.remove(0,2);
+            QStringList list2 = line.split(' ', QString::SkipEmptyParts);
 
-                  QString s= list2[0];
-                  day=s.toInt(0);
-                  s= list2[1];
-                  blackPig=s.toInt();
-                  s= list2[2];
-                  smallFlowerPig=s.toInt();
-                   s= list2[3];
-                   bigWhitePig=s.toInt();
-
-
-                  s=QString("在第%1天,购入%2头黑猪,%3头小花猪,%4头大白猪").arg(day).arg(blackPig).arg(smallFlowerPig).arg(bigWhitePig);
-                 edit->append(s);
-              }
+            QString s= list2[0];
+            day=s.toInt(0);
+            s= list2[1];
+            blackPig=s.toInt();
+            s= list2[2];
+            smallFlowerPig=s.toInt();
+            s= list2[3];
+            bigWhitePig=s.toInt();
 
 
+            s=QString("在第%1天,购入%2头黑猪,%3头小花猪,%4头大白猪").arg(day).arg(blackPig).arg(smallFlowerPig).arg(bigWhitePig);
+            edit->append(s);
+        }
 
-          }
-          ifs.close();
- }
+
+
+    }
+    ifs.close();
+}

@@ -6,6 +6,7 @@ DrawGraph::DrawGraph(QWidget *parent)
 {
     this->resize(500, 700);
     this->setWindowTitle("该品种猪的总数量，及体重饲养时间分布图");
+
 }
 
 
@@ -16,39 +17,40 @@ DrawGraph::~DrawGraph()
 
 void DrawGraph::paintEvent(QPaintEvent *e)
 {
-    m_nPeopleCount = 0;
+    drawCount = 0;
 
-    m_answerStrList = m_answerMap.keys();
-    m_numList = m_answerMap.values();
-    foreach (int num, m_numList) {
-        m_nPeopleCount += num;
+    drawStrList = drawMap.keys();
+    drawList = drawMap.values();
+    foreach (int num, drawList) {
+        drawCount += num;
     }
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(Qt::NoBrush);
 
-    if(m_numList.isEmpty())
+    painter.setPen(QPen(QColor(79, 106, 25), 1, Qt::SolidLine,
+                        Qt::FlatCap, Qt::MiterJoin));
+    painter.setBrush(QColor(122, 163, 39));
+
+
+    if(drawList.isEmpty())
     {
         return;
     }
 
-    painter.setPen(Qt::black);
-
-    int lineWidth = 450;
+    int lineWidth = 460;   //设置坐标轴的宽度
     int lineX = this->width()/2 - lineWidth/2;
     int lineY = 670;
-    painter.drawLine(lineX, lineY, lineX + lineWidth, lineY);
+    painter.drawLine(lineX, lineY, lineX + lineWidth, lineY);//画出坐标轴
 
-    int answerCount = m_answerStrList.count();
+    int keyCount = drawStrList.count();   //键的个数
     int maxWidth = 45;
     int maxHeight = 1000;
 
-    int curWidth = maxWidth - (answerCount - 1)*3;
-    int unitWidth = lineWidth/answerCount;
+    int axiWidth = maxWidth - (keyCount - 1)*3;//柱状图的宽度
+    int unitWidth = lineWidth/keyCount; //每个部件的宽度
 
     //获取选项中值最大的那个，以这个为基准高度，来计算其他值的高度
-    int maxVal = getMaxVal(m_numList);
+    int maxVal = getMax(drawList);
     int unitHeight = 0;
     if(maxVal)
     {
@@ -57,55 +59,55 @@ void DrawGraph::paintEvent(QPaintEvent *e)
 
     QFont ft;
     ft.setPixelSize(13);
-    for(int i = 0; i < m_answerStrList.count(); ++i)
+    for(int i = 0; i < drawStrList.count(); i++)
     {
-        QString answerStr = m_answerStrList.at(i);
-        int selectNum = m_numList.at(i);
-        QString selectNumStr = QString::number(selectNum);
+        QString keyStr = drawStrList.at(i);//取出键
+        int valueNum = drawList.at(i);//取出值
+        QString valueNumStr = QString::number(valueNum);//将值化成string类型
 
-        int x = lineX + i*unitWidth + unitWidth/2 - curWidth/2;
+        int x = lineX + i*unitWidth + unitWidth/2 - axiWidth/2;
         //绘制柱状图
-        int GraphHight = selectNum*unitHeight*0.6;
-        QRect r = QRect(x, lineY - GraphHight, curWidth, GraphHight);
+        int GraphHight = valueNum*unitHeight*0.6;  //柱状图的高度
+        QRect r = QRect(x, lineY - GraphHight, axiWidth, GraphHight);//柱状图的矩形
         QPainterPath path;
         path.addRect(r);
-        painter.fillPath(path, QColor(185, 185, 185));
+        painter.fillPath(path, QColor(122, 163, 39));//在矩形里填充颜色
 
-        //绘制答案
+        //绘制文字
         QFontMetrics metrics(ft);
-        int charWitdh = metrics.width(answerStr);
-        QRect answerRect;
+        int charWidth = metrics.width(keyStr);//得到键的宽度
+        QRect keyRect;
         /*
-/**     对比文字长度和柱状图的宽度，比柱状图宽的以文字的长度为基准会画，反之以
- *      柱状图的宽度来画，保证显示全并居中，下面的也是一样
- */
-        if(charWitdh < curWidth)
+       对比文字长度和柱状图的宽度，比柱状图宽的以文字的长度为基准画，反之以
+       柱状图的宽度来画，保证显示全并居中.主要用来绘制键和值
+        */
+        if(charWidth < axiWidth)
         {
-            answerRect = QRect(x, lineY, curWidth, 30);
+            keyRect = QRect(x, lineY, axiWidth, 30);//以柱状图的宽度画
         }
         else
         {
-            answerRect = QRect(x - (charWitdh - curWidth)/2, lineY, charWitdh, 30);
+            keyRect = QRect(x - (charWidth - axiWidth)/2, lineY, charWidth, 30);//以文字宽度画
         }
-        painter.drawText(answerRect, Qt::AlignCenter, answerStr);
+        painter.drawText(keyRect, Qt::AlignCenter, keyStr);
 
         //绘制每个选项对应的值
-        QRect percentRect;
-        charWitdh = metrics.width(selectNumStr);
-        if(charWitdh < curWidth)
+        QRect valueRect;
+        charWidth = metrics.width(valueNumStr);//得到值的宽度
+        if(charWidth < axiWidth)
         {
-            percentRect = QRect(x, lineY - GraphHight - 30, curWidth, 30);
+            valueRect = QRect(x, lineY - GraphHight - 30, axiWidth, 30);
         }
         else
         {
-            percentRect = QRect(x - (charWitdh - curWidth)/2, lineY - GraphHight - 40, charWitdh, 30);
+            valueRect = QRect(x - (charWidth - axiWidth)/2, lineY - GraphHight - 40, charWidth, 30);
         }
-        painter.drawText(percentRect, Qt::AlignCenter, selectNumStr);
+        painter.drawText(valueRect, Qt::AlignCenter, valueNumStr);
 
     }
 }
 
-int DrawGraph::getMaxVal(QList<int> list)
+int DrawGraph::getMax(QList<int> list)
 {
     qSort(list.begin(), list.end());
     return list.last();

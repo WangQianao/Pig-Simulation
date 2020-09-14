@@ -12,9 +12,9 @@ public:
     explicit CheckMenu(PigFarm*pigFarm, QWidget *parent = nullptr);
     void readSaleAndBuyInfo();
     void readInfo( QTextEdit * edit,QString filename);
-
+    void paintEvent(QPaintEvent *event);
 signals:
-     void checkMenuBack();
+    void checkMenuBack();
 
 public slots:
 };
