@@ -10,7 +10,6 @@ AddPigWidget::AddPigWidget(PigFarm * pigFarm,QWidget *parent) :
     qsrand(time(NULL));
     ui->setupUi(this);
     this->setWindowTitle("购入猪崽界面");
-    void(QSpinBox::*spinSig)(int)=&QSpinBox::valueChanged;
     //点击确认按钮后，触发
     connect(ui->BuypushButton,&QPushButton::clicked,[=](){
         this->blackPig= ui->blackPigSpinBox->value();

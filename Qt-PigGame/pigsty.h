@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "pig.h"
+#include <QString>
 class PigSty : public QObject
 {
     Q_OBJECT
@@ -35,7 +36,7 @@ class PigSty : public QObject
         void clear();
         void increasePigNums(PigBreed::Type breed);
         void decreasePigNums(PigBreed::Type breed);
-        void print(int t);
+        QString print(int t);
         void pigStyNextTime(int day);
         int countPigNumOfWeight(PigBreed::Type breed,double weight1,double weight2);
         int countPigNumOfGrowTime(PigBreed::Type breed,int month1,int month2);

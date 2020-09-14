@@ -1,6 +1,6 @@
 #ifndef PIG_H
 #define PIG_H
-
+#include <QString>
 #include <QObject>
 #include "pigbreed.h"
 class Pig : public QObject
@@ -31,7 +31,7 @@ class Pig : public QObject
         void insert(Pig*p);
         void growWeight(int day);
         void pigNextTime(int day);
-        void pigPrint();
+        QString pigPrint();
 
 signals:
 

@@ -1,5 +1,5 @@
 #include "pigsty.h"
-
+#include <QDebug>
 PigSty::PigSty(QObject *parent) : QObject(parent)
 {
     init();
@@ -18,13 +18,11 @@ void PigSty::init()
     this->smallFlowerPigNums=0;
 }
 
-void PigSty::print(int t)
+QString PigSty::print(int t)
 {
-    /*
-    cout<<"±àºÅÎª"<<t<<"µÄÖíÈ¦ÏÖÓÐ"<<this->pigNum<<"Í·Öí"<<endl;
-    cout<<"ÆäÖÐºÚÖí£º"<<this->blackPigNums<<"Í·    Ð¡»¨Öí£º"<<this->smallFlowerPigNums<<"Í·    ´ó°×Öí£º"<<this->bigWhitePigNums<<"Í·"<<endl;
-
-*/
+    QString info;
+    info=QString("编号为 %1 的猪圈现在有 %2 头猪,其中黑猪 %3 头,小花猪 %4 头,大白猪 %5 头").arg(t).arg(this->pigNum).arg(this->blackPigNums).arg(this->smallFlowerPigNums).arg(this->bigWhitePigNums);
+    return info;
 }
 void PigSty::increasePigNums(PigBreed::Type breed)
 {
@@ -92,6 +90,7 @@ void PigSty::pigStyNextTime(int day)
 {
     for(Pig*p=this->first();p!=this->trailer;p=p->succ)
     {
+
         p->pigNextTime(day);
     }
 }

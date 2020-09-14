@@ -4,6 +4,8 @@
 #include <QObject>
 #include "pigsty.h"
 #include "addpigwidget.h"
+#include "drawgraph.h"
+class DrawGraph;
 class PigFarm : public QObject
 {
     Q_OBJECT
@@ -41,9 +43,9 @@ public:
         void salePigs(int day);
         void changePigDistribution(int blackPigStys);
         void pigFarmNextTime(int day);
-        void printEachBreedDistribution();
-        void printPigDistribution(PigBreed::Type breed,int lo,int hi);
+        void eachBreedDis(PigBreed::Type breed,int lo,int hi);
         int fever(int pigStyIndex,int pigIndex);
+        void clearPigFarm();
 
 signals:
         void addSuccess();

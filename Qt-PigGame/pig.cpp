@@ -1,5 +1,6 @@
 #include "pig.h"
 #include<QTime>
+#include <QDebug>
 Pig::Pig(QObject *parent) : QObject(parent)
 {
     pred=NULL;
@@ -31,26 +32,28 @@ void Pig::growWeight(int day)
 }
 void Pig::pigNextTime(int day)
 {
+
     this->growWeight(day);
     this->growDay+=day;
 }
-void Pig::pigPrint()
+QString Pig::pigPrint()
 {
-    /*
-    cout<<"Æ·ÖÖ£º";
+    QString info="品种:";
+
     switch(breed)
     {
         case 0:
-            cout<<"ºÚÖí      ";
+           info.append("黑猪");
             break;
             case 1:
-                cout<<"Ð¡»¨Öí      ";
+                 info.append("小花猪");
                 break;
             case 2:
-                cout<<"´ó°×Öí       ";
+                info.append("大白猪");
                 break;
     }
-    cout<<"ÌåÖØ:"<<weight<<"kg         ";
-    cout<<"ËÇÑøÊ±¼ä:"<<growDay<<"Ìì"<<endl;
-    */
+    QString info1=QString("  体重:%1 kg 饲养时间: %2 天").arg(weight).arg(growDay);
+    info.append(info1);
+    return info;
+
 }

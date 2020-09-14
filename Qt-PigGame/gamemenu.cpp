@@ -11,7 +11,7 @@
 #include<QMessageBox>
 GameMenu::GameMenu(PigFarm*pigFarm,QWidget *parent) : QMainWindow(parent)
 {
-
+     checkMenu = new CheckMenu(pigFarm);
     //设置窗口固定大小
     this->setFixedSize(320,588);
     //设置标题
@@ -21,25 +21,26 @@ GameMenu::GameMenu(PigFarm*pigFarm,QWidget *parent) : QMainWindow(parent)
     exitButton->setFixedSize(200,50);
     exitButton->move(this->width()*0.5-exitButton->width()*0.5,this->height()*0.8);
     connect(exitButton,&QPushButton::clicked,[=](){
-        QTimer::singleShot(500, this,[=](){
+
                    this->hide();
                    //触发自定义信号，关闭自身，该信号写到 signals下做声明
                    emit this->gameMenuBack();
-                    }
-               );
+
+
     });
 
      //设置去到查询窗口的按钮
     QPushButton * checkButton=new QPushButton("查询猪场相关信息",this);
     checkButton->move(this->width()*0.5-checkButton->width()*0.5,this->height()*0.1);
     connect(checkButton,&QPushButton::clicked,[=](){
-        QTimer::singleShot(500,this,[=](){
+
+
             this->hide();
             checkMenu->show();
-        });
+
 
     });
-    //监听选择场景的返回按钮
+    //监听查询场景的返回按钮
     connect(checkMenu,&CheckMenu::checkMenuBack,[=](){
                     this->show();
                });
@@ -87,18 +88,17 @@ GameMenu::GameMenu(PigFarm*pigFarm,QWidget *parent) : QMainWindow(parent)
     QPushButton * saveButton=new QPushButton("保存游戏",this);
     saveButton->move(this->width()*0.5-saveButton->width()*0.5,this->height()*0.7);
     connect(saveButton,QPushButton::clicked,[=](){
-
-
-
-
+           emit saveGame();
     });
     //设置猪瘟模拟按钮
     QPushButton * feverSimulationButton=new QPushButton("猪瘟模拟",this);
     feverSimulationButton->move(this->width()*0.5-feverSimulationButton->width()*0.5,this->height()*0.55);
     connect(feverSimulationButton,QPushButton::clicked,[=](){
-
+                emit feverSimulation();
     });
 }
+
+
  void GameMenu::paintEvent(QPaintEvent *event)
  {
      //显示当前游戏天数
@@ -112,3 +112,9 @@ GameMenu::GameMenu(PigFarm*pigFarm,QWidget *parent) : QMainWindow(parent)
 
 
  }
+
+
+GameMenu::~GameMenu()
+{
+    delete checkMenu;
+}

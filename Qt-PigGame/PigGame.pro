@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -32,7 +32,8 @@ SOURCES += \
     pigbreed.cpp \
     pig.cpp \
     pigsty.cpp \
-    pigfarm.cpp
+    pigfarm.cpp \
+    drawgraph.cpp
 
 HEADERS += \
         mainsence.h \
@@ -42,7 +43,8 @@ HEADERS += \
     pigbreed.h \
     pig.h \
     pigsty.h \
-    pigfarm.h
+    pigfarm.h \
+    drawgraph.h
 
 FORMS += \
         mainsence.ui \
