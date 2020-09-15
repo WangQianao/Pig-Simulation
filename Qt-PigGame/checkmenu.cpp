@@ -8,6 +8,7 @@
 #include <QTextEdit>
 #include <QPainter>
 #include <QPixmap>
+#include <QSound>
 CheckMenu::CheckMenu(QWidget *parent) : QMainWindow(parent)
 {
     //设置窗口固定大小
@@ -15,11 +16,14 @@ CheckMenu::CheckMenu(QWidget *parent) : QMainWindow(parent)
     this->setWindowIcon(QPixmap(":/new/prefix1/PigIcon.png"));
     //设置标题
     this->setWindowTitle("查询窗口");
+    //为按钮设置音效
+    QSound *buttonSound = new QSound(":/new/prefix1/music/TapButtonSound.wav",this);
     //设置查询某一猪圈的猪的数量和种类的按钮
     QPushButton * checkStyButton=new QPushButton("查询某一猪圈的猪的数量和种类",this);
     checkStyButton->setFixedSize(200,60);
     checkStyButton->move(this->width()*0.5-checkStyButton->width()*0.5,this->height()*0.1);
     connect(checkStyButton,&QPushButton::clicked,[=](){
+        buttonSound->play();
             emit checkPigSty();
     });
 
@@ -28,6 +32,7 @@ CheckMenu::CheckMenu(QWidget *parent) : QMainWindow(parent)
     checkPigButton->setFixedSize(200,60);
     checkPigButton->move(this->width()*0.5-checkPigButton->width()*0.5,this->height()*0.25);
     connect(checkPigButton,&QPushButton::clicked,[=](){
+         buttonSound->play();
             emit checkPig();
 
     });
@@ -36,6 +41,7 @@ CheckMenu::CheckMenu(QWidget *parent) : QMainWindow(parent)
     checkDisButton->setFixedSize(200,60);
     checkDisButton->move(this->width()*0.5-checkDisButton->width()*0.5,this->height()*0.4);
     connect(checkDisButton,&QPushButton::clicked,[=](){
+         buttonSound->play();
         emit checkPigBreedDis();
 
     });
@@ -44,7 +50,7 @@ CheckMenu::CheckMenu(QWidget *parent) : QMainWindow(parent)
     checkSaleAndBuyButton->setFixedSize(200,60);
     checkSaleAndBuyButton->move(this->width()*0.5-checkSaleAndBuyButton->width()*0.5,this->height()*0.55);
     connect(checkSaleAndBuyButton,&QPushButton::clicked,[=](){
-
+        buttonSound->play();
         readSaleAndBuyInfo();
     });
 
@@ -54,6 +60,7 @@ CheckMenu::CheckMenu(QWidget *parent) : QMainWindow(parent)
     exitButton->setFixedSize(200,60);
     exitButton->move(this->width()*0.5-exitButton->width()*0.5,this->height()*0.7);
     connect(exitButton,&QPushButton::clicked,[=](){
+         buttonSound->play();
         this->hide();
         //触发自定义信号，关闭自身，该信号写到 signals下做声明
         emit this->checkMenuBack();

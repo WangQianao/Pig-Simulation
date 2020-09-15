@@ -12,6 +12,7 @@
 #include <QFont>
 #include <QPainter>
 #include <QPixmap>
+
 MainSence::MainSence(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainSence)
@@ -21,38 +22,54 @@ MainSence::MainSence(QWidget *parent) :
     this->setFixedSize(600,600);
     this->setWindowTitle("养猪游戏");
     this->setWindowIcon(QPixmap(":/new/prefix1/pigIcon1.png"));
+    //为主场景设置背景音乐
+    this->mainSenceSound = new QSound(":/new/prefix1/music/pigGameMusic.wav",this);
+    this->mainSenceSound->setLoops(QSound::Infinite);//让音乐无限循环,设置一次不需再次设置
+    this->mainSenceSound->play();//最开始一打开游戏就开始播放音乐
+    //为按钮设置音效
+    QSound *buttonSound = new QSound(":/new/prefix1/music/TapButtonSound.wav",this);
     //设置游戏退出按钮
     QPushButton * exitButton=new QPushButton("退出",this);
     exitButton->setFixedSize(200,60);
     exitButton->move(this->width()*0.5-exitButton->width()*0.5,this->height()*0.7);
     connect(exitButton,&QPushButton::clicked,[=](){
-        this-close();
+        buttonSound->play();
+        QTimer::singleShot(500,this,[=](){
+            this-close();
+        });
+
     });
     //设置开始游戏按钮
     QPushButton * newBeginButton=new QPushButton("新的开始",this);
     newBeginButton->setFixedSize(200,60);
     newBeginButton->move(this->width()*0.5-newBeginButton->width()*0.5,this->height()*0.3);
     connect(newBeginButton,&QPushButton::clicked,[=](){
-        pigFarm->clearPigFarm();  //每次开始新的游戏都需要清空养猪场
-        gameMenu->gameDay=1;       //每次开始新的游戏将游戏天数初始化
-        gameMenu->lastSalePigDay=1;
-        gameMenu->money=1000000;
-        clearFile("TemporaryPigSaleAndBuyInfo.txt");//开始新的游戏，清空文件内容
-        clearFile("PigSaleAndBuyInfo.txt");
-        clearFile("PigGameInfo.txt");
-        this->hide();
-        QMessageBox msgBox;
-        msgBox.setIcon(QMessageBox::Information);
-        QString txt ="欢迎开始新的游戏，现在请为养猪场添加第一批猪崽";
-        msgBox.setText(txt);
-        msgBox.exec();
-        pigFarm->addPigs(gameMenu,gameMenu->gameDay); //刚进入游戏，为养猪场分配第一批猪崽
-        connect(pigFarm,&PigFarm::addSuccess,[=](){ //分配猪崽成功，就打开下一个窗口，进入游戏界面
+        buttonSound->play();
 
-            gameMenu->setGeometry(this->geometry());//使下一个窗口打开时其位置不发生变化
-            gameMenu->show();
+        QTimer::singleShot(500,this,[=](){
+            pigFarm->clearPigFarm();  //每次开始新的游戏都需要清空养猪场
+            gameMenu->gameDay=1;       //每次开始新的游戏将游戏天数初始化
+            gameMenu->lastSalePigDay=1;
+            gameMenu->money=1000000;
+            clearFile("TemporaryPigSaleAndBuyInfo.txt");//开始新的游戏，清空文件内容
+            clearFile("PigSaleAndBuyInfo.txt");
+            clearFile("PigGameInfo.txt");
+            this->hide();
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Information);
+            QString txt ="欢迎开始新的游戏，现在请为养猪场添加第一批猪崽";
+            msgBox.setText(txt);
+            msgBox.exec();
+            pigFarm->addPigs(gameMenu,gameMenu->gameDay); //刚进入游戏，为养猪场分配第一批猪崽
+            connect(pigFarm,&PigFarm::addSuccess,[=](){ //分配猪崽成功，就打开下一个窗口，进入游戏界面
 
+                gameMenu->setGeometry(this->geometry());//使下一个窗口打开时其位置不发生变化
+                gameMenu->show();
+
+            });
         });
+
+
 
 
 
@@ -62,15 +79,20 @@ MainSence::MainSence(QWidget *parent) :
     readOldButton->setFixedSize(200,60);
     readOldButton->move(this->width()*0.5-exitButton->width()*0.5,this->height()*0.5);
     connect(readOldButton,QPushButton::clicked,[=](){
-        clearFile("TemporaryPigSaleAndBuyInfo.txt");
-        pigFarm->clearPigFarm();//读取存档之前也要先将农场初始化
-        if(initializeGameByFileAndPrint("PigGameInfo.txt",pigFarm))//如果读取存档成功，则打开下一个窗口，进入游戏界面
-        {
-            this->hide();
-            gameMenu->setGeometry(this->geometry());
-            gameMenu->show();
+        buttonSound->play();
+        QTimer::singleShot(500,this,[=](){
+            clearFile("TemporaryPigSaleAndBuyInfo.txt");
+            pigFarm->clearPigFarm();//读取存档之前也要先将农场初始化
+            if(initializeGameByFileAndPrint("PigGameInfo.txt",pigFarm))//如果读取存档成功，则打开下一个窗口，进入游戏界面
+            {
+                this->hide();
+                gameMenu->setGeometry(this->geometry());
+                gameMenu->show();
 
-        }
+            }
+        });
+
+
 
 
     });

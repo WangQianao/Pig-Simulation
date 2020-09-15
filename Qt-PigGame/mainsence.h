@@ -1,6 +1,6 @@
 #ifndef MAINSENCE_H
 #define MAINSENCE_H
-
+#include <QSound>
 #include <QMainWindow>
 #include "gamemenu.h"
 #include "pigfarm.h"
@@ -13,6 +13,7 @@ class MainSence : public QMainWindow
     Q_OBJECT
 
 public:
+    QSound * mainSenceSound = NULL;
     explicit MainSence(QWidget *parent = 0);
     ~MainSence();
     GameMenu * gameMenu = new GameMenu;

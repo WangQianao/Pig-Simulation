@@ -9,6 +9,7 @@
 #include<QMessageBox>
 #include <QPixmap>
 #include <QInputDialog>
+#include<QSound>
 GameMenu::GameMenu(QWidget *parent) : QMainWindow(parent)
 {
     checkMenu = new CheckMenu;
@@ -17,12 +18,14 @@ GameMenu::GameMenu(QWidget *parent) : QMainWindow(parent)
     this->setFixedSize(600,600);
     //设置标题
     this->setWindowTitle("养猪场");
+    //为按钮设置音效
+    QSound *buttonSound = new QSound(":/new/prefix1/music/TapButtonSound.wav",this);
     //设置返回游戏主界面的按钮
     QPushButton * exitButton=new QPushButton("退回游戏主界面(不会自动保存)",this);
     exitButton->setFixedSize(200,60);
     exitButton->move(this->width()*0.5-exitButton->width()*0.5,this->height()*0.85);
     connect(exitButton,&QPushButton::clicked,[=](){
-
+        buttonSound->play();
         this->hide();
         //触发自定义信号，关闭自身，该信号写到 signals下做声明
         emit this->gameMenuBack();
@@ -36,7 +39,7 @@ GameMenu::GameMenu(QWidget *parent) : QMainWindow(parent)
     checkButton->move(this->width()*0.5-checkButton->width()*0.5,this->height()*0.1);
     connect(checkButton,&QPushButton::clicked,[=](){
 
-
+        buttonSound->play();
         this->hide();
         checkMenu->setGeometry(this->geometry());//保持窗口位置不发生变化
         checkMenu->show();
@@ -54,6 +57,7 @@ GameMenu::GameMenu(QWidget *parent) : QMainWindow(parent)
     nextDayButton->setFixedSize(200,60);
     nextDayButton->move(this->width()*0.5-nextDayButton->width()*0.5,this->height()*0.25);
     connect(nextDayButton,QPushButton::clicked,[=](){
+        buttonSound->play();
         emit nextDay();
 
     });
@@ -63,6 +67,7 @@ GameMenu::GameMenu(QWidget *parent) : QMainWindow(parent)
     nextMonthButton->setFixedSize(200,60);
     nextMonthButton->move(this->width()*0.5-nextMonthButton->width()*0.5,this->height()*0.4);
     connect(nextMonthButton,QPushButton::clicked,[=](){
+        buttonSound->play();
         emit nextMonth();
     });
     //设置保存按钮
@@ -70,6 +75,7 @@ GameMenu::GameMenu(QWidget *parent) : QMainWindow(parent)
     saveButton->setFixedSize(200,60);
     saveButton->move(this->width()*0.5-saveButton->width()*0.5,this->height()*0.7);
     connect(saveButton,QPushButton::clicked,[=](){
+        buttonSound->play();
         emit saveGame();
     });
     //设置猪瘟模拟按钮
@@ -77,6 +83,7 @@ GameMenu::GameMenu(QWidget *parent) : QMainWindow(parent)
     feverSimulationButton->setFixedSize(200,60);
     feverSimulationButton->move(this->width()*0.5-feverSimulationButton->width()*0.5,this->height()*0.55);
     connect(feverSimulationButton,QPushButton::clicked,[=](){
+        buttonSound->play();
         emit feverSimulation();
     });
 

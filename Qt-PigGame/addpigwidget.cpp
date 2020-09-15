@@ -6,6 +6,7 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QPushButton>
+#include <QSound>
 AddPigWidget::AddPigWidget(PigFarm * pigFarm,QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AddPigWidget)
@@ -16,6 +17,8 @@ AddPigWidget::AddPigWidget(PigFarm * pigFarm,QWidget *parent) :
     this->setWindowTitle("购入猪崽界面");
     this->setFixedSize(600,600);
     this->setWindowIcon(QPixmap(":/new/prefix1/pigIcon1.png"));
+    //为按钮设置音效
+    QSound *buttonSound = new QSound(":/new/prefix1/music/TapButtonSound.wav",this);
     //配置随机选择按钮
     QPushButton * randomPushButton = new QPushButton(this);
     QPixmap pix;
@@ -46,6 +49,8 @@ AddPigWidget::AddPigWidget(PigFarm * pigFarm,QWidget *parent) :
 
     //点击确认按钮后，触发
     connect(BuypushButton,&QPushButton::clicked,[=](){
+        buttonSound->play();
+
         this->blackPig= ui->blackPigSpinBox->value();
         this->smallFlowerPig= ui->smallFlowerPigSpinBox->value();
         this->bigWhitePig= ui->bigWhiteSpinBox->value();
@@ -103,6 +108,7 @@ AddPigWidget::AddPigWidget(PigFarm * pigFarm,QWidget *parent) :
     //点击随机生成按钮后触发
     connect(randomPushButton,&QPushButton::clicked,[=](){
 
+        buttonSound->play();
         blackPig=qrand()%(pigFarm->getSurplus()+1);
         smallFlowerPig=qrand()%(pigFarm->getSurplus()-blackPig+1);
         bigWhitePig=qrand()%(pigFarm->getSurplus()-blackPig-smallFlowerPig+1);
