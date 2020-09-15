@@ -29,9 +29,9 @@ void PigSty::increasePigNums(PigBreed::Type breed)
     pigNum++;
     switch(breed)
     {
-        case 0: this->blackPigNums++;break;
-        case 1: this->smallFlowerPigNums++;break;
-        case 2: this->bigWhitePigNums++;break;
+    case 0: this->blackPigNums++;break;
+    case 1: this->smallFlowerPigNums++;break;
+    case 2: this->bigWhitePigNums++;break;
     }
 }
 void PigSty::decreasePigNums(PigBreed::Type breed)
@@ -39,9 +39,9 @@ void PigSty::decreasePigNums(PigBreed::Type breed)
     pigNum--;
     switch(breed)
     {
-        case 0: this->blackPigNums--;break;
-        case 1: this->smallFlowerPigNums--;break;
-        case 2: this->bigWhitePigNums--;break;
+    case 0: this->blackPigNums--;break;
+    case 1: this->smallFlowerPigNums--;break;
+    case 2: this->bigWhitePigNums--;break;
     }
 }
 void PigSty::insert(Pig*p)
@@ -66,12 +66,12 @@ void PigSty::clear()
 }
 Pig* PigSty::removePig(Pig*p)
 {
-        p->pred->succ=p->succ;
-        p->succ->pred=p->pred;
-        p->pred=NULL;
-        p->succ=NULL;
-        this->decreasePigNums(p->getBreed());
-        return p;
+    p->pred->succ=p->succ;
+    p->succ->pred=p->pred;
+    p->pred=NULL;
+    p->succ=NULL;
+    this->decreasePigNums(p->getBreed());
+    return p;
 }
 Pig& PigSty::operator[](int index)
 {

@@ -11,7 +11,7 @@ PigFarm::PigFarm(QObject *parent) : QObject(parent)
     this->flowerPigStyIndex=0;
 }
 
-void PigFarm::salePigs(int day) {
+void PigFarm::salePigs(GameMenu*game,int day) {
     int blackPig=0,smallFlowerPig=0,bigWhitePig=0;
     double totalSalePrice=0;
     Pig*q;
@@ -21,18 +21,18 @@ void PigFarm::salePigs(int day) {
                 q=p;
                 p=p->pred;
                 switch(q->getBreed()) {
-                    case 0:
-                        blackPig++;
-                        totalSalePrice+=(q->getWeight()*Pig::salesPrice[0]);
-                        break;
-                    case 1:
-                        smallFlowerPig++;
-                        totalSalePrice+=(q->getWeight()*Pig::salesPrice[1]);
-                        break;
-                    case 2:
-                        bigWhitePig++;
-                        totalSalePrice+=(q->getWeight()*Pig::salesPrice[2]);
-                        break;
+                case 0:
+                    blackPig++;
+                    totalSalePrice+=(q->getWeight()*Pig::salesPrice[0]);
+                    break;
+                case 1:
+                    smallFlowerPig++;
+                    totalSalePrice+=(q->getWeight()*Pig::salesPrice[1]);
+                    break;
+                case 2:
+                    bigWhitePig++;
+                    totalSalePrice+=(q->getWeight()*Pig::salesPrice[2]);
+                    break;
                 }
                 q=this->pigStys[i].removePig(q);
                 delete q;
@@ -53,15 +53,16 @@ void PigFarm::salePigs(int day) {
     QTextStream out(&ofs);
     out<<'+'<<" "<<day<<" "<<blackPig<<" "<<smallFlowerPig<<" "<<bigWhitePig<<" "<<totalSalePrice<<"\n";
     ofs.close();
-
-
+    game->money+=totalSalePrice;
     msgBox.setIcon(QMessageBox::Information);
     QString str = QString("这次共卖出%1头黑猪,%2头小花猪,%3头大白猪,共%4元").arg(blackPig).arg(smallFlowerPig).arg(bigWhitePig).arg(QString::number(totalSalePrice,'f',1));
-      msgBox.setText(str);
-      msgBox.exec();
+    msgBox.setText(str);
+    msgBox.exec();
 }
-void PigFarm::print() {
-    //cout<<"ÖíÈ¦¹²ÓÐ"<<this->totalPigNums<<"Í·Öí"<<"ºÚÖí"<<this->totalBlackPigNums<<"Í· Ð¡»¨Öí"<<this->totalSmallFlowerPigNums<<"Í·   ¡ä´ó°×Öí"<<this->totalBigWhitePigNums<<"Í·"<<endl;
+QString PigFarm::print() {
+
+    QString s=QString("当前养猪场共有%1头猪,%2头黑猪,%3头小花猪,%4头大白猪").arg( this->totalPigNums).arg(this->totalBlackPigNums).arg(this->totalSmallFlowerPigNums).arg(this->totalBigWhitePigNums);
+    return s;
 }
 void PigFarm::increasePigNums(int blackPig,int smallFlowerPig,int bigWhitePig) {
     this->totalPigNums+=(blackPig+smallFlowerPig+bigWhitePig);
@@ -111,9 +112,13 @@ void PigFarm::putPigIntoSty(int c,int d,int singlePigNum,int oneLessNumPigStys,i
                     } else {
                         if(c>0) {
                             this->pigStys[t].insert(breed1);
+
                             c--;
                         } else {
+
                             this->pigStys[t].insert(breed2);
+
+
                             d--;
                         }
                     }
@@ -132,9 +137,11 @@ void PigFarm::putPigIntoSty(int c,int d,int singlePigNum,int oneLessNumPigStys,i
                             if(c>0) {
 
                                 this->pigStys[t].insert(breed1);
+
                                 c--;
                             } else {
                                 this->pigStys[t].insert(breed2);
+
                                 d--;
                             }
                         }
@@ -149,9 +156,11 @@ void PigFarm::putPigIntoSty(int c,int d,int singlePigNum,int oneLessNumPigStys,i
                         } else {
                             if(c>0) {
                                 this->pigStys[t].insert(breed1);
+
                                 c--;
                             } else {
                                 this->pigStys[t].insert(breed2);
+
                                 d--;
                             }
                         }
@@ -185,10 +194,12 @@ void PigFarm::changePigDistribution(int blackPigStys) {
     }
     this->flowerPigStyIndex=blackPigStys;
 }
-void PigFarm::addPigs(int day) {
-      AddPigWidget *widget = new AddPigWidget(this);
-       widget->show();
-     connect(widget,&AddPigWidget::AddPigWidgetBack,[=](){
+void PigFarm::addPigs(GameMenu* game,int day) {
+    AddPigWidget *widget = new AddPigWidget(this);
+
+    widget->money=game->money;
+    widget->show();
+    connect(widget,&AddPigWidget::AddPigWidgetBack,[=](){
 
         widget->hide();//点击了确认按钮并且购买成功后，就会关闭购买界面
         int extraBlackPigs=(this->totalBlackPigNums+widget->blackPig)%widget->single;
@@ -211,8 +222,9 @@ void PigFarm::addPigs(int day) {
         }
 
         QTextStream out(&ofs);
-        out<<'-'<<" "<<day<<" "<<widget->blackPig<<" "<<widget->smallFlowerPig<<" "<<widget->bigWhitePig<<"\n";
+        out<<'-'<<" "<<day<<" "<<widget->blackPig<<" "<<widget->smallFlowerPig<<" "<<widget->bigWhitePig<<" "<<widget->price<<"\n";
         this->increasePigNums(widget->blackPig,widget->smallFlowerPig,widget->bigWhitePig);
+        game->money-=widget->price;//在这个函数里减去钱
         delete widget;
         emit  addSuccess();//购买成功后发送购买 成功信号
 
@@ -232,42 +244,7 @@ int PigFarm::fever(int pigStyIndex,int pigIndex) {
     this->pigStys[pigStyIndex][pigIndex].infected=true;
     this->pigStys[pigStyIndex][pigIndex].infectedDay++;
     while(this->totalPigNums!=deadPigNum) {
-        for(int i=0; i<PigFarm::totalPigStyNums; i++) {
-            for(Pig*p=this->pigStys[i].first(); p!=this->pigStys[i].last()->succ; p=p->succ) {
-                if(p->infected&&p->infectedDay>0) {
-                    for(Pig*q=this->pigStys[i].first(); q!=this->pigStys[i].last()->succ; q=q->succ) {
-                        if(q==p||q->infected)continue;
-                        else {
-                            if(rand()%2==1) {
-                                q->infected=true;
-                            }
-                        }
-                    }
-                    if(i-1>=0) {
-                        for(Pig*q=this->pigStys[i-1].first(); q!=this->pigStys[i-1].last()->succ; q=q->succ) {
-                            if(q->infected)continue;
-                            else {
-                                int t=rand()%20;
-                                if(t==1||t==2||t==3) { //%15¸ÅÂÊ
-                                    q->infected=true;
-                                }
-                            }
-                        }
-                    }
-                    if(i+1<PigFarm::totalPigStyNums) {
-                        for(Pig*q=this->pigStys[i+1].first(); q!=this->pigStys[i+1].last()->succ; q=q->succ) {
-                            if(q->infected)continue;
-                            else {
-                                int t=rand()%20;
-                                if(t==1||t==2||t==3) { //%15¸ÅÂÊ
-                                    q->infected=true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        infecting();
         Pig*q;
         for(int i=0; i<PigFarm::totalPigStyNums; i++)
         {
@@ -300,55 +277,55 @@ void PigFarm::eachBreedDis(PigBreed::Type breed,int lo,int hi)
 {
     DrawGraph * draw = new DrawGraph;
     switch(breed) {
-        case 0:
-         draw->m_answerMap.insert("黑猪",this->totalBlackPigNums);
-            break;
-        case 1:
-         draw->m_answerMap.insert("小花猪",this->totalSmallFlowerPigNums);
+    case 0:
+        draw->drawMap.insert("黑猪",this->totalBlackPigNums);
+        break;
+    case 1:
+        draw->drawMap.insert("小花猪",this->totalSmallFlowerPigNums);
 
-            break;
-        case 2:
-           draw->m_answerMap.insert("大白猪",this->totalBigWhitePigNums);
-            break;
+        break;
+    case 2:
+        draw->drawMap.insert("大白猪",this->totalBigWhitePigNums);
+        break;
     }
     int pigNum=0;
     for(int i=lo; i<hi; i++) {
         pigNum+=this->pigStys[i].countPigNumOfWeight(breed,20,49);
     }
-    draw->m_answerMap.insert("[20-50)kg", pigNum);
+    draw->drawMap.insert("[20-50)kg", pigNum);
     pigNum=0;
 
     for(int i=lo; i<hi; i++) {
         pigNum+=this->pigStys[i].countPigNumOfWeight(breed,50,75);
     }
-      draw->m_answerMap.insert("[50-75]kg", pigNum);
+    draw->drawMap.insert("[50-75]kg", pigNum);
 
     pigNum=0;
 
     for(int i=lo; i<hi; i++) {
         pigNum+=this->pigStys[i].countPigNumOfWeight(breed,75,1000);
     }
-     draw->m_answerMap.insert(">75kg", pigNum);
+    draw->drawMap.insert(">75kg", pigNum);
 
     pigNum=0;
 
     for(int i=lo; i<hi; i++) {
         pigNum+=this->pigStys[i].countPigNumOfGrowTime(breed,0,3);
     }
-     draw->m_answerMap.insert("<3月", pigNum);
+    draw->drawMap.insert("<3月", pigNum);
 
     pigNum=0;
 
     for(int i=lo; i<hi; i++) {
         pigNum+=this->pigStys[i].countPigNumOfGrowTime(breed,3,9);
     }
-    draw->m_answerMap.insert("[3,9)月", pigNum);
+    draw->drawMap.insert("[3,9)月", pigNum);
     pigNum=0;
 
     for(int i=lo; i<hi; i++) {
         pigNum+=this->pigStys[i].countPigNumOfGrowTime(breed,9,12);
     }
-     draw->m_answerMap.insert("[9,12)月", pigNum);
+    draw->drawMap.insert("[9,12)月", pigNum);
 
     draw->update();
     draw->show();
@@ -356,16 +333,55 @@ void PigFarm::eachBreedDis(PigBreed::Type breed,int lo,int hi)
 
 
 }
- void PigFarm::clearPigFarm()
- {
-     for(int i=0;i<PigFarm::totalPigStyNums;i++)
-     {
-         this->pigStys[i].clear();
-     }
-     this->totalPigNums=0;
-     this->totalBlackPigNums=0;
-     this->totalSmallFlowerPigNums=0;
-     this->totalBigWhitePigNums=0;
-     this->flowerPigStyIndex=0;
+void PigFarm::infecting()
+{
+    for(int i=0; i<PigFarm::totalPigStyNums; i++) {
+        for(Pig*p=this->pigStys[i].first(); p!=this->pigStys[i].last()->succ; p=p->succ) {
+            if(p->infected&&p->infectedDay>0) {
+                for(Pig*q=this->pigStys[i].first(); q!=this->pigStys[i].last()->succ; q=q->succ) {
+                    if(q==p||q->infected)continue;
+                    else {
+                        if(rand()%2==1) {
+                            q->infected=true;
+                        }
+                    }
+                }
+                if(i-1>=0) {
+                    for(Pig*q=this->pigStys[i-1].first(); q!=this->pigStys[i-1].last()->succ; q=q->succ) {
+                        if(q->infected)continue;
+                        else {
+                            int t=rand()%20;
+                            if(t==1||t==2||t==3) { //%15¸ÅÂÊ
+                                q->infected=true;
+                            }
+                        }
+                    }
+                }
+                if(i+1<PigFarm::totalPigStyNums) {
+                    for(Pig*q=this->pigStys[i+1].first(); q!=this->pigStys[i+1].last()->succ; q=q->succ) {
+                        if(q->infected)continue;
+                        else {
+                            int t=rand()%20;
+                            if(t==1||t==2||t==3) { //%15¸ÅÂÊ
+                                q->infected=true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+void PigFarm::clearPigFarm()
+{
+    for(int i=0;i<PigFarm::totalPigStyNums;i++)
+    {
+        this->pigStys[i].clear();
+    }
+    this->totalPigNums=0;
+    this->totalBlackPigNums=0;
+    this->totalSmallFlowerPigNums=0;
+    this->totalBigWhitePigNums=0;
+    this->flowerPigStyIndex=0;
 
- }
+}

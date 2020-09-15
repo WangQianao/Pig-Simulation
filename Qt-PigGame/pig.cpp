@@ -42,15 +42,15 @@ QString Pig::pigPrint()
 
     switch(breed)
     {
-        case 0:
-           info.append("黑猪");
-            break;
-            case 1:
-                 info.append("小花猪");
-                break;
-            case 2:
-                info.append("大白猪");
-                break;
+    case 0:
+        info.append("黑猪");
+        break;
+    case 1:
+        info.append("小花猪");
+        break;
+    case 2:
+        info.append("大白猪");
+        break;
     }
     QString info1=QString("  体重:%1 kg 饲养时间: %2 天").arg(weight).arg(growDay);
     info.append(info1);
