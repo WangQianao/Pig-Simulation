@@ -1,16 +1,14 @@
 #include "checkmenu.h"
 #include <QPushButton>
 #include <QTimer>
-#include <QInputDialog>
 #include <QMessageBox>
 #include <QDebug>
 #include <QFile>
-#include "drawgraph.h"
 #include <QWidget>
 #include <QTextEdit>
 #include <QPainter>
 #include <QPixmap>
-CheckMenu::CheckMenu(PigFarm*pigFarm, QWidget *parent) : QMainWindow(parent)
+CheckMenu::CheckMenu(QWidget *parent) : QMainWindow(parent)
 {
     //设置窗口固定大小
     this->setFixedSize(600,600);
@@ -19,110 +17,46 @@ CheckMenu::CheckMenu(PigFarm*pigFarm, QWidget *parent) : QMainWindow(parent)
     this->setWindowTitle("查询窗口");
     //设置查询某一猪圈的猪的数量和种类的按钮
     QPushButton * checkStyButton=new QPushButton("查询某一猪圈的猪的数量和种类",this);
-    checkStyButton->setFixedSize(200,50);
+    checkStyButton->setFixedSize(200,60);
     checkStyButton->move(this->width()*0.5-checkStyButton->width()*0.5,this->height()*0.1);
     connect(checkStyButton,&QPushButton::clicked,[=](){
-
-
-        int Styindex=QInputDialog::getInt(this,"查询猪圈状态","请输入猪圈的编号(0-99)",0,0,99);
-        //使用QMessageBox来显示猪圈信息
-        QMessageBox msgBox;
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.setText(pigFarm->pigStys[Styindex].print(Styindex));
-        msgBox.exec();
-
+            emit checkPigSty();
     });
 
     //设置查询某一猪圈某一头猪的按钮
     QPushButton * checkPigButton=new QPushButton("查询某一猪圈某一头猪",this);
-    checkPigButton->setFixedSize(200,50);
+    checkPigButton->setFixedSize(200,60);
     checkPigButton->move(this->width()*0.5-checkPigButton->width()*0.5,this->height()*0.25);
     connect(checkPigButton,&QPushButton::clicked,[=](){
-
-        int styIndex=QInputDialog::getInt(this,"查询某一头猪的状态","请输入猪圈的编号(0-99)",0,0,99);
-        if(pigFarm->pigStys[styIndex].getPigNum()==0)
-        {
-            QMessageBox msgBox;
-            msgBox.setIcon(QMessageBox::Information);
-            msgBox.setText("该猪圈一头猪都没有,故无法查询");
-            msgBox.exec();
-        }
-        else
-        {
-            QString t = QString("请输入猪的编号(0- %1 )").arg(pigFarm->pigStys[styIndex].getPigNum()-1);
-            int pigIndex=QInputDialog::getInt(this,"查询某一头猪的状态",t,0,0,pigFarm->pigStys[styIndex].getPigNum()-1);
-            //使用QMessageBox来显示猪的信息
-            QMessageBox msgBox;
-            msgBox.setIcon(QMessageBox::Information);
-            msgBox.setText(pigFarm->pigStys[styIndex][pigIndex].pigPrint());
-            msgBox.exec();
-        }
-
-
-
+            emit checkPig();
 
     });
     //设置统计猪场每个品种猪的数量和该品种猪的体重、饲养时间分布情况按钮
     QPushButton * checkDisButton=new QPushButton("查看猪的体重,饲养时间分布",this);
-    checkDisButton->setFixedSize(200,50);
+    checkDisButton->setFixedSize(200,60);
     checkDisButton->move(this->width()*0.5-checkDisButton->width()*0.5,this->height()*0.4);
     connect(checkDisButton,&QPushButton::clicked,[=](){
-        //让用户选择查询哪个品种猪的分布
-        QStringList items;
-        items << "黑猪" << "小花猪" << "大白猪";
-        bool ok;
-        QInputDialog in ;
-
-        QString item = in.getItem(this, "请选择品种",
-                                  "品种:", items, 0, false, &ok);
-        if (ok && !item.isEmpty())
-        {
-
-            if(item==items[0])
-            {
-                pigFarm->eachBreedDis(PigBreed::black,0,pigFarm->flowerPigStyIndex);
-
-            }
-            else if(item==items[1])
-            {
-
-                pigFarm->eachBreedDis(PigBreed::smallFlower,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
-            }else
-            {
-
-                pigFarm->eachBreedDis(PigBreed::bigWhite,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
-            }
-
-
-
-
-        }
+        emit checkPigBreedDis();
 
     });
     //设置查询销售和购入记录的按钮
     QPushButton * checkSaleAndBuyButton=new QPushButton("查询销售和购入记录",this);
-    checkSaleAndBuyButton->setFixedSize(200,50);
+    checkSaleAndBuyButton->setFixedSize(200,60);
     checkSaleAndBuyButton->move(this->width()*0.5-checkSaleAndBuyButton->width()*0.5,this->height()*0.55);
     connect(checkSaleAndBuyButton,&QPushButton::clicked,[=](){
 
         readSaleAndBuyInfo();
-
-
-
     });
 
 
     //设置返回游戏主界面的按钮
     QPushButton * exitButton=new QPushButton("返回上一界面",this);
-    exitButton->setFixedSize(200,50);
+    exitButton->setFixedSize(200,60);
     exitButton->move(this->width()*0.5-exitButton->width()*0.5,this->height()*0.7);
     connect(exitButton,&QPushButton::clicked,[=](){
-
-
         this->hide();
         //触发自定义信号，关闭自身，该信号写到 signals下做声明
         emit this->checkMenuBack();
-
 
     });
 
@@ -199,9 +133,10 @@ void CheckMenu::readInfo( QTextEdit * edit,QString filename)
             smallFlowerPig=s.toInt();
             s= list2[3];
             bigWhitePig=s.toInt();
+            s=list2[4];
+            price=s.toDouble();
 
-
-            s=QString("在第%1天,购入%2头黑猪,%3头小花猪,%4头大白猪").arg(day).arg(blackPig).arg(smallFlowerPig).arg(bigWhitePig);
+            s=QString("在第%1天,购入%2头黑猪,%3头小花猪,%4头大白猪,共花费%5元").arg(day).arg(blackPig).arg(smallFlowerPig).arg(bigWhitePig).arg(QString::number(price,'f',1));
             edit->append(s);
         }
 

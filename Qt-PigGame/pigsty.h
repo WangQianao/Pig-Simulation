@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include "pig.h"
-#include <QString>
 class PigSty : public QObject
 {
     Q_OBJECT

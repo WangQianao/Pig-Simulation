@@ -3,9 +3,6 @@
 
 #include <QMainWindow>
 #include <QMap>
-#include "pigfarm.h"
-#include "pigbreed.h"
-class PigFarm;
 class DrawGraph : public QMainWindow
 {
     Q_OBJECT

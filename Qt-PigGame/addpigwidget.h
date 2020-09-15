@@ -17,6 +17,8 @@ public:
     int smallFlowerPig=0;
     int bigWhitePig=0;
     int single=0;
+    double money=0;
+    double price=0;
     explicit AddPigWidget(PigFarm*pigFarm, QWidget *parent = 0);
     void paintEvent(QPaintEvent *event);
     ~AddPigWidget();

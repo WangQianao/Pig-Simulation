@@ -29,7 +29,6 @@ void DrawGraph::paintEvent(QPaintEvent *e)
 
     painter.setPen(QPen(QColor(79, 106, 25), 1, Qt::SolidLine,
                         Qt::FlatCap, Qt::MiterJoin));
-    painter.setBrush(QColor(122, 163, 39));
 
 
     if(drawList.isEmpty())
@@ -71,7 +70,7 @@ void DrawGraph::paintEvent(QPaintEvent *e)
         QRect r = QRect(x, lineY - GraphHight, axiWidth, GraphHight);//柱状图的矩形
         QPainterPath path;
         path.addRect(r);
-        painter.fillPath(path, QColor(122, 163, 39));//在矩形里填充颜色
+        painter.fillPath(path, QColor(Qt::cyan));//在矩形里填充颜色
 
         //绘制文字
         QFontMetrics metrics(ft);

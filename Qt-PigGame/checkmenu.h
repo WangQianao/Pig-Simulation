@@ -3,19 +3,20 @@
 
 #include <QMainWindow>
 #include <QTextEdit>
-#include "pigfarm.h"
 #include<QString>
 class CheckMenu : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit CheckMenu(PigFarm*pigFarm, QWidget *parent = nullptr);
+    explicit CheckMenu( QWidget *parent = nullptr);
     void readSaleAndBuyInfo();
     void readInfo( QTextEdit * edit,QString filename);
     void paintEvent(QPaintEvent *event);
 signals:
     void checkMenuBack();
-
+    void checkPigSty();
+    void checkPig();
+    void checkPigBreedDis();
 public slots:
 };
 

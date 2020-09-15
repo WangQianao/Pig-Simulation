@@ -16,24 +16,27 @@ MainSence::MainSence(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainSence)
 {
-    gameMenu = new GameMenu(pigFarm);
+
     ui->setupUi(this);
     this->setFixedSize(600,600);
     this->setWindowTitle("养猪游戏");
     this->setWindowIcon(QPixmap(":/new/prefix1/pigIcon1.png"));
     //设置游戏退出按钮
     QPushButton * exitButton=new QPushButton("退出",this);
+    exitButton->setFixedSize(200,60);
     exitButton->move(this->width()*0.5-exitButton->width()*0.5,this->height()*0.7);
     connect(exitButton,&QPushButton::clicked,[=](){
         this-close();
     });
     //设置开始游戏按钮
     QPushButton * newBeginButton=new QPushButton("新的开始",this);
+    newBeginButton->setFixedSize(200,60);
     newBeginButton->move(this->width()*0.5-newBeginButton->width()*0.5,this->height()*0.3);
     connect(newBeginButton,&QPushButton::clicked,[=](){
         pigFarm->clearPigFarm();  //每次开始新的游戏都需要清空养猪场
         gameMenu->gameDay=1;       //每次开始新的游戏将游戏天数初始化
         gameMenu->lastSalePigDay=1;
+        gameMenu->money=1000000;
         clearFile("TemporaryPigSaleAndBuyInfo.txt");//开始新的游戏，清空文件内容
         clearFile("PigSaleAndBuyInfo.txt");
         clearFile("PigGameInfo.txt");
@@ -43,7 +46,7 @@ MainSence::MainSence(QWidget *parent) :
         QString txt ="欢迎开始新的游戏，现在请为养猪场添加第一批猪崽";
         msgBox.setText(txt);
         msgBox.exec();
-        pigFarm->addPigs(gameMenu->gameDay); //刚进入游戏，为养猪场分配第一批猪崽
+        pigFarm->addPigs(gameMenu,gameMenu->gameDay); //刚进入游戏，为养猪场分配第一批猪崽
         connect(pigFarm,&PigFarm::addSuccess,[=](){ //分配猪崽成功，就打开下一个窗口，进入游戏界面
 
             gameMenu->setGeometry(this->geometry());//使下一个窗口打开时其位置不发生变化
@@ -56,6 +59,7 @@ MainSence::MainSence(QWidget *parent) :
     });
     //设置读取存档按钮
     QPushButton * readOldButton=new QPushButton("读取存档",this);
+    readOldButton->setFixedSize(200,60);
     readOldButton->move(this->width()*0.5-exitButton->width()*0.5,this->height()*0.5);
     connect(readOldButton,QPushButton::clicked,[=](){
         clearFile("TemporaryPigSaleAndBuyInfo.txt");
@@ -85,17 +89,103 @@ MainSence::MainSence(QWidget *parent) :
         copySaleFile();
         saveGameInfo("pigGameInfo.txt",pigFarm);
     });
+    //监听进入下一天的信号
+    connect(gameMenu,&GameMenu::nextDay,[=](){
+        nextTime(1);
+    });
+    //监听进入下一个月的信号
+    connect(gameMenu,&GameMenu::nextMonth,[=](){
+        nextTime(30);
+    });
+    //监听从游戏界面返回的查询一个猪圈信息的信号
+    connect(gameMenu,&GameMenu::gameCheckPigSty,[=](){
+        int Styindex=QInputDialog::getInt(this,"查询猪圈状态","请输入猪圈的编号(0-99)",0,0,99);
+        //使用QMessageBox来显示猪圈信息
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText(pigFarm->pigStys[Styindex].print(Styindex));
+        msgBox.exec();
+    });
+    //监听从游戏界面返回的查询一个猪信息的信号
+    connect(gameMenu,&GameMenu::gameCheckPig,[=](){
+        int styIndex=QInputDialog::getInt(this,"查询某一头猪的状态","请输入猪圈的编号(0-99)",0,0,99);
+        if(pigFarm->pigStys[styIndex].getPigNum()==0)
+        {
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.setText("该猪圈一头猪都没有,故无法查询");
+            msgBox.exec();
+        }
+        else
+        {
+            QString t = QString("请输入猪的编号(0- %1 )").arg(pigFarm->pigStys[styIndex].getPigNum()-1);
+            int pigIndex=QInputDialog::getInt(this,"查询某一头猪的状态",t,0,0,pigFarm->pigStys[styIndex].getPigNum()-1);
+            //使用QMessageBox来显示猪的信息
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.setText(pigFarm->pigStys[styIndex][pigIndex].pigPrint());
+            msgBox.exec();
+        }
+    });
+    //监听从游戏界面返回的查询一个猪品种分布信息的信号
+    connect(gameMenu,&GameMenu::gameCheckPigBreedDis,[=](){
+        //让用户选择查询哪个品种猪的分布
+        QStringList items;
+        items << "黑猪" << "小花猪" << "大白猪";
+        bool ok;
+        QInputDialog in ;
+
+        QString item = in.getItem(this, "请选择品种",
+                                  "品种:", items, 0, false, &ok);
+        if (ok && !item.isEmpty())
+        {
+
+            if(item==items[0])
+            {
+                pigFarm->eachBreedDis(PigBreed::black,0,pigFarm->flowerPigStyIndex);
+
+            }
+            else if(item==items[1])
+            {
+
+                pigFarm->eachBreedDis(PigBreed::smallFlower,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
+            }else
+            {
+
+                pigFarm->eachBreedDis(PigBreed::bigWhite,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
+            }
+
+        }
+
+    });
 }
 void MainSence::paintEvent(QPaintEvent *event)
 {
-        //创建画家，指定绘图设备
-        QPainter painter(this);
-        //创建QPixmap对象
-        QPixmap pix;
-        //加载图片
-        pix.load(":/new/prefix1/piggame1.png");
-        //绘制背景图
-        painter.drawPixmap(0,0,this->width(),this->height(),pix);
+    //创建画家，指定绘图设备
+    QPainter painter(this);
+    //创建QPixmap对象
+    QPixmap pix;
+    //加载图片
+    pix.load(":/new/prefix1/piggame1.png");
+    //绘制背景图
+    painter.drawPixmap(0,0,this->width(),this->height(),pix);
+}
+void MainSence::nextTime(int day)
+{
+    gameMenu->gameDay+=day;
+    pigFarm->pigFarmNextTime(day);//调用函数使养猪场里的每一头猪体重增长
+    gameMenu->update();     //刷新窗口
+    if(( gameMenu->gameDay- gameMenu->lastSalePigDay)/30>=3) {//如果离上一次购入猪崽的时间已经过去了三个月，就再一次购入
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText("现在到了出圈一批猪的时间");
+        msgBox.exec();
+        pigFarm->salePigs(gameMenu,gameMenu->gameDay);
+        msgBox.setText("同时也要为养猪场购入一批猪崽");
+        msgBox.exec();
+        pigFarm->addPigs( gameMenu, gameMenu->gameDay);
+        gameMenu->lastSalePigDay= gameMenu->gameDay;
+    }
 }
 void MainSence::copySaleFile()
 {
@@ -111,7 +201,6 @@ void MainSence::copySaleFile()
     }
     QByteArray arr=ifs.readAll();
     ofs.write(arr);
-
     ifs.close();
     ofs.close();
     clearFile("TemporaryPigSaleAndBuyInfo.txt");
@@ -132,7 +221,7 @@ void MainSence::saveGameInfo(QString filename,PigFarm*pigFarm)
     QTextStream out(&ofs);
 
     out<<'#'<<" ";
-    out<<gameMenu->gameDay<<" "<<gameMenu->lastSalePigDay<<"\n";
+    out<<gameMenu->gameDay<<" "<<gameMenu->lastSalePigDay<<" "<<gameMenu->money<<"\n";
     out<<pigFarm->getTotalPigNums()<<" "<<pigFarm->getTotalBlackPigNums()<<" "<<pigFarm->getTotalSmallFlowerPigNums()<<" "<<pigFarm->getTotalBigWhitePigNums()<<" "<<pigFarm->getFlowerPigStyIndex()<<"\n";
     for(int i=0; i<PigFarm::totalPigStyNums; i++) {
         out<<pigFarm->pigStys[i].getPigNum()<<" "<<pigFarm->pigStys[i].getBlackPigNum()<<" "<<pigFarm->pigStys[i].getSmallFlowerPigNum()<<" "<<pigFarm->pigStys[i].getBigWhitePigNum()<<"\n";
@@ -147,7 +236,6 @@ void MainSence::clearFile(QString filename)
 
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-
     {
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Critical);
@@ -155,10 +243,7 @@ void MainSence::clearFile(QString filename)
         msgBox.exec();
         exit(0);
     }
-
     file.close();
-
-
 }
 void MainSence::feverSimulation(PigFarm*pigFarm)
 {
@@ -209,9 +294,6 @@ void  MainSence::initializeGameByFile(QString filename,PigFarm*pigFarm)
         msgBox.exec();
         exit(0);
     }
-
-
-
     QTextStream in(&ifs);
 
 
@@ -223,7 +305,8 @@ void  MainSence::initializeGameByFile(QString filename,PigFarm*pigFarm)
     s= list2[1];
     gameMenu->lastSalePigDay=s.toInt();
 
-
+    s= list2[2];
+    gameMenu->money=s.toDouble();
     line = in.readLine();
     list2.clear();
     list2 = line.split(' ', QString::SkipEmptyParts);
@@ -325,7 +408,9 @@ bool MainSence::initializeGameByFileAndPrint(QString filename,PigFarm*pigFarm)
         gameMenu->gameDay=s.toInt();
         s= list2[1];
         gameMenu->lastSalePigDay=s.toInt();
-        s=QString("游戏进行到第%1天").arg(gameMenu->gameDay);
+        s= list2[2];
+        gameMenu->money=s.toDouble();
+        s=QString("游戏进行到第%1天,余额%2元").arg(gameMenu->gameDay).arg(QString::number( gameMenu->money,'f',1));
         edit->append(s);
 
         line = in.readLine();
@@ -399,11 +484,6 @@ bool MainSence::initializeGameByFileAndPrint(QString filename,PigFarm*pigFarm)
 
 
     }
-
-
-
-
-
     ifs.close();
     return flag;
 }

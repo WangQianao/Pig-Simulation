@@ -15,6 +15,7 @@ AddPigWidget::AddPigWidget(PigFarm * pigFarm,QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("购入猪崽界面");
     this->setFixedSize(600,600);
+    this->setWindowIcon(QPixmap(":/new/prefix1/pigIcon1.png"));
     //配置随机选择按钮
     QPushButton * randomPushButton = new QPushButton(this);
     QPixmap pix;
@@ -48,12 +49,18 @@ AddPigWidget::AddPigWidget(PigFarm * pigFarm,QWidget *parent) :
         this->blackPig= ui->blackPigSpinBox->value();
         this->smallFlowerPig= ui->smallFlowerPigSpinBox->value();
         this->bigWhitePig= ui->bigWhiteSpinBox->value();
+        price=Pig::buyPrice[0]*this->blackPig+Pig::buyPrice[1]*this->smallFlowerPig+Pig::buyPrice[2]*this->bigWhitePig;
         QMessageBox msgBox;
         QString txt = QString("此次购买%1头黑猪,%2头小花猪,%3头大白猪").arg(this->blackPig).arg(this->smallFlowerPig).arg(this->bigWhitePig);
         msgBox.setText(txt);
         msgBox.exec();
         bool hasSpace=false;
-        if(blackPig+smallFlowerPig+bigWhitePig<=pigFarm->getSurplus())
+        if(money<price)
+        {
+            msgBox.setText("你的钱不够,无法购买这么多猪崽");
+            msgBox.exec();
+        }
+        else if(blackPig+smallFlowerPig+bigWhitePig<=pigFarm->getSurplus())
         {
             for(int i=1; i<=PigSty::pigNumMax; i++) {
                 if((((pigFarm->totalSmallFlowerPigNums+pigFarm->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)/i)+((pigFarm->totalBlackPigNums+blackPig)/i))>pigFarm->totalPigStyNums) {
@@ -73,19 +80,22 @@ AddPigWidget::AddPigWidget(PigFarm * pigFarm,QWidget *parent) :
                     break;
                 }
             }
+            if(hasSpace) {
+
+                msgBox.setText("此次购入猪崽成功");
+                msgBox.exec();
+                emit AddPigWidgetBack();
+            } else {
+
+                msgBox.setText("由于猪圈中无法装下这些猪，此次购入失败，请重新进行选择");
+                msgBox.exec();
+
+            }
+
+
         }
 
-        if(hasSpace) {
 
-            msgBox.setText("此次购入猪崽成功");
-            msgBox.exec();
-            emit AddPigWidgetBack();
-        } else {
-
-            msgBox.setText("由于猪圈中无法装下这些猪，此次购入失败，请重新进行选择");
-            msgBox.exec();
-
-        }
 
 
 

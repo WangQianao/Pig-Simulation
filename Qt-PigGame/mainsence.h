@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include "gamemenu.h"
 #include "pigfarm.h"
-#include <QString>
 namespace Ui {
 class MainSence;
 }
@@ -16,7 +15,7 @@ class MainSence : public QMainWindow
 public:
     explicit MainSence(QWidget *parent = 0);
     ~MainSence();
-    GameMenu * gameMenu = NULL;
+    GameMenu * gameMenu = new GameMenu;
     PigFarm * pigFarm = new PigFarm;
     bool initializeGameByFileAndPrint(QString filename,PigFarm*pigFarm);
     void initializeGameByFile(QString filename,PigFarm*pigFarm);
@@ -25,6 +24,7 @@ public:
     void copySaleFile();
     void saveGameInfo(QString filename,PigFarm*pigFarm);
     void paintEvent(QPaintEvent *event);
+    void nextTime(int day);
 private:
     Ui::MainSence *ui;
 };
