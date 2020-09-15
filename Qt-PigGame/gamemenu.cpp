@@ -86,15 +86,17 @@ GameMenu::GameMenu(QWidget *parent) : QMainWindow(parent)
         buttonSound->play();
         emit feverSimulation();
     });
-
+    //监听从查询场景返回的查询猪圈的信号
     connect(checkMenu,&CheckMenu::checkPigSty,[=](){
         emit gameCheckPigSty();
 
     });
+    //监听从查询场景返回的查询猪的信号
     connect(checkMenu,&CheckMenu::checkPig,[=](){
         emit gameCheckPig();
 
     });
+    //监听从查询场景返回的查询猪分布情况的信号
     connect(checkMenu,&CheckMenu::checkPigBreedDis,[=](){
         emit gameCheckPigBreedDis();
 
@@ -113,7 +115,7 @@ void GameMenu::paintEvent(QPaintEvent *event)
     painter.drawPixmap(0,0,this->width(),this->height(),pix);
     QFont font;
     font.setFamily("华文新魏");
-    font.setPointSize(22);
+    font.setPointSize(18);
     painter.setFont(font);
     QString str = QString("第 %1 天").arg(this->gameDay);
     painter.drawText(QRect(30, this->height() - 50,120, 50),str);

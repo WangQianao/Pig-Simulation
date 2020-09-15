@@ -4,7 +4,7 @@
 DrawGraph::DrawGraph(QWidget *parent)
     : QMainWindow(parent)
 {
-    this->resize(500, 700);
+    this->resize(600, 600);
     this->setWindowTitle("该品种猪的总数量，及体重饲养时间分布图");
 
 }
@@ -17,16 +17,11 @@ DrawGraph::~DrawGraph()
 
 void DrawGraph::paintEvent(QPaintEvent *e)
 {
-    drawCount = 0;
 
     drawStrList = drawMap.keys();
     drawList = drawMap.values();
-    foreach (int num, drawList) {
-        drawCount += num;
-    }
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-
+    painter.setRenderHint(QPainter::Antialiasing, true);//反走样，防止出现锯齿
     painter.setPen(QPen(QColor(79, 106, 25), 1, Qt::SolidLine,
                         Qt::FlatCap, Qt::MiterJoin));
 
@@ -36,17 +31,15 @@ void DrawGraph::paintEvent(QPaintEvent *e)
         return;
     }
 
-    int lineWidth = 460;   //设置坐标轴的宽度
+    int lineWidth = 560;   //设置坐标轴的宽度
     int lineX = this->width()/2 - lineWidth/2;
-    int lineY = 670;
+    int lineY = 570;
     painter.drawLine(lineX, lineY, lineX + lineWidth, lineY);//画出坐标轴
 
     int keyCount = drawStrList.count();   //键的个数
-    int maxWidth = 45;
-    int maxHeight = 1000;
-
-    int axiWidth = maxWidth - (keyCount - 1)*3;//柱状图的宽度
     int unitWidth = lineWidth/keyCount; //每个部件的宽度
+    int maxHeight = 1000;
+    int axiWidth=unitWidth-20;        //实际柱状图的宽度
 
     //获取选项中值最大的那个，以这个为基准高度，来计算其他值的高度
     int maxVal = getMax(drawList);
@@ -66,11 +59,11 @@ void DrawGraph::paintEvent(QPaintEvent *e)
 
         int x = lineX + i*unitWidth + unitWidth/2 - axiWidth/2;
         //绘制柱状图
-        int GraphHight = valueNum*unitHeight*0.6;  //柱状图的高度
+        int GraphHight = valueNum*unitHeight*0.5;  //柱状图的高度
         QRect r = QRect(x, lineY - GraphHight, axiWidth, GraphHight);//柱状图的矩形
         QPainterPath path;
         path.addRect(r);
-        painter.fillPath(path, QColor(Qt::cyan));//在矩形里填充颜色
+        painter.fillPath(path, QColor(Qt::gray));//在矩形里填充颜色
 
         //绘制文字
         QFontMetrics metrics(ft);

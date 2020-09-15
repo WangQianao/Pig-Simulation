@@ -40,7 +40,7 @@ public:
     void salePigs(GameMenu*game,int day);
     void changePigDistribution(int blackPigStys);
     void pigFarmNextTime(int day);
-    void eachBreedDis(PigBreed::Type breed,int lo,int hi);
+    void eachBreedDis(DrawGraph*draw, PigBreed::Type breed,int lo,int hi);
     int fever(int pigStyIndex,int pigIndex);
     void infecting();//进行猪瘟传染
     void clearPigFarm();

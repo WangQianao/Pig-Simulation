@@ -273,9 +273,10 @@ int PigFarm::fever(int pigStyIndex,int pigIndex) {
 
     return day;
 }
-void PigFarm::eachBreedDis(PigBreed::Type breed,int lo,int hi)
+void PigFarm::eachBreedDis(DrawGraph*draw,PigBreed::Type breed,int lo,int hi)
 {
-    DrawGraph * draw = new DrawGraph;
+
+
     switch(breed) {
     case 0:
         draw->drawMap.insert("黑猪",this->totalBlackPigNums);

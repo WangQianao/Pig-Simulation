@@ -5,7 +5,6 @@
 #include <QMessageBox>
 #include "addpigwidget.h"
 #include <QFile>
-#include <QWidget>
 #include <QTextEdit>
 #include <QTextStream>
 #include <QInputDialog>
@@ -61,14 +60,8 @@ MainSence::MainSence(QWidget *parent) :
             msgBox.setText(txt);
             msgBox.exec();
             pigFarm->addPigs(gameMenu,gameMenu->gameDay); //刚进入游戏，为养猪场分配第一批猪崽
-            connect(pigFarm,&PigFarm::addSuccess,[=](){ //分配猪崽成功，就打开下一个窗口，进入游戏界面
 
-                gameMenu->setGeometry(this->geometry());//使下一个窗口打开时其位置不发生变化
-                gameMenu->show();
-
-            });
         });
-
 
 
 
@@ -96,6 +89,14 @@ MainSence::MainSence(QWidget *parent) :
 
 
     });
+    //监听购买猪崽场景返回
+    connect(pigFarm,&PigFarm::addSuccess,[=](){ //分配猪崽成功，就打开下一个窗口，进入游戏界面
+
+        gameMenu->setGeometry(this->geometry());//使下一个窗口打开时其位置不发生变化
+        gameMenu->show();
+
+    });
+
     //监听游戏场景的返回
     connect(gameMenu,&GameMenu::gameMenuBack,[=](){
         this->setGeometry(gameMenu->geometry());//从上一个窗口返回时保持窗口位置不变
@@ -159,22 +160,24 @@ MainSence::MainSence(QWidget *parent) :
 
         QString item = in.getItem(this, "请选择品种",
                                   "品种:", items, 0, false, &ok);
+        DrawGraph * draw = new DrawGraph(this);
+        draw->setWindowIcon(QPixmap(":/new/prefix1/pigIcon1.png"));
         if (ok && !item.isEmpty())
         {
 
             if(item==items[0])
             {
-                pigFarm->eachBreedDis(PigBreed::black,0,pigFarm->flowerPigStyIndex);
+                pigFarm->eachBreedDis(draw,PigBreed::black,0,pigFarm->flowerPigStyIndex);
 
             }
             else if(item==items[1])
             {
 
-                pigFarm->eachBreedDis(PigBreed::smallFlower,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
+                pigFarm->eachBreedDis(draw,PigBreed::smallFlower,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
             }else
             {
 
-                pigFarm->eachBreedDis(PigBreed::bigWhite,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
+                pigFarm->eachBreedDis(draw,PigBreed::bigWhite,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
             }
 
         }
@@ -198,6 +201,7 @@ void MainSence::nextTime(int day)
     pigFarm->pigFarmNextTime(day);//调用函数使养猪场里的每一头猪体重增长
     gameMenu->update();     //刷新窗口
     if(( gameMenu->gameDay- gameMenu->lastSalePigDay)/30>=3) {//如果离上一次购入猪崽的时间已经过去了三个月，就再一次购入
+        gameMenu->hide();
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Information);
         msgBox.setText("现在到了出圈一批猪的时间");
@@ -269,7 +273,7 @@ void MainSence::clearFile(QString filename)
 }
 void MainSence::feverSimulation(PigFarm*pigFarm)
 {
-    QWidget * wid = new QWidget;
+    QMainWindow * wid = new QMainWindow(this);
     wid->setWindowTitle("猪瘟模拟");
     wid->setFixedSize(320,500);
     QTextEdit * edit = new QTextEdit(wid);
@@ -394,9 +398,10 @@ void  MainSence::initializeGameByFile(QString filename,PigFarm*pigFarm)
 
 bool MainSence::initializeGameByFileAndPrint(QString filename,PigFarm*pigFarm)
 {
-    QWidget * wid = new QWidget;
+    QMainWindow * wid = new QMainWindow(this);
     wid->setWindowTitle("存档信息");
     wid->setFixedSize(320,500);
+    wid->setWindowIcon(QPixmap(":/new/prefix1/pigIcon1.png"));
     QTextEdit * edit = new QTextEdit(wid);
     edit->setFixedSize(wid->width(),wid->height());
     QFile ifs(filename);

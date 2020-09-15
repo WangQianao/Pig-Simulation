@@ -24,7 +24,7 @@ CheckMenu::CheckMenu(QWidget *parent) : QMainWindow(parent)
     checkStyButton->move(this->width()*0.5-checkStyButton->width()*0.5,this->height()*0.1);
     connect(checkStyButton,&QPushButton::clicked,[=](){
         buttonSound->play();
-            emit checkPigSty();
+        emit checkPigSty();
     });
 
     //设置查询某一猪圈某一头猪的按钮
@@ -32,8 +32,8 @@ CheckMenu::CheckMenu(QWidget *parent) : QMainWindow(parent)
     checkPigButton->setFixedSize(200,60);
     checkPigButton->move(this->width()*0.5-checkPigButton->width()*0.5,this->height()*0.25);
     connect(checkPigButton,&QPushButton::clicked,[=](){
-         buttonSound->play();
-            emit checkPig();
+        buttonSound->play();
+        emit checkPig();
 
     });
     //设置统计猪场每个品种猪的数量和该品种猪的体重、饲养时间分布情况按钮
@@ -41,7 +41,7 @@ CheckMenu::CheckMenu(QWidget *parent) : QMainWindow(parent)
     checkDisButton->setFixedSize(200,60);
     checkDisButton->move(this->width()*0.5-checkDisButton->width()*0.5,this->height()*0.4);
     connect(checkDisButton,&QPushButton::clicked,[=](){
-         buttonSound->play();
+        buttonSound->play();
         emit checkPigBreedDis();
 
     });
@@ -60,7 +60,7 @@ CheckMenu::CheckMenu(QWidget *parent) : QMainWindow(parent)
     exitButton->setFixedSize(200,60);
     exitButton->move(this->width()*0.5-exitButton->width()*0.5,this->height()*0.7);
     connect(exitButton,&QPushButton::clicked,[=](){
-         buttonSound->play();
+        buttonSound->play();
         this->hide();
         //触发自定义信号，关闭自身，该信号写到 signals下做声明
         emit this->checkMenuBack();
@@ -82,6 +82,7 @@ void CheckMenu::paintEvent(QPaintEvent *event)
 void CheckMenu::readSaleAndBuyInfo()
 {
     QWidget * wid = new QWidget;
+    wid->setWindowTitle("销售和购入记录");
     wid->setFixedSize(320,500);
     QTextEdit * edit = new QTextEdit(wid);
     edit->setFixedSize(wid->width(),wid->height());
