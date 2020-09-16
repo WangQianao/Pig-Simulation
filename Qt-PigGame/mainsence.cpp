@@ -49,7 +49,7 @@ MainSence::MainSence(QWidget *parent) :
             pigFarm->clearPigFarm();  //每次开始新的游戏都需要清空养猪场
             gameMenu->gameDay=1;       //每次开始新的游戏将游戏天数初始化
             gameMenu->lastSalePigDay=1;
-            gameMenu->money=1000000;
+            gameMenu->money=900000;
             clearFile("TemporaryPigSaleAndBuyInfo.txt");//开始新的游戏，清空文件内容
             clearFile("PigSaleAndBuyInfo.txt");
             clearFile("PigGameInfo.txt");
