@@ -68,15 +68,15 @@ AddPigWidget::AddPigWidget(PigFarm * pigFarm,QWidget *parent) :
         else if(blackPig+smallFlowerPig+bigWhitePig<=pigFarm->getSurplus())
         {
             for(int i=1; i<=PigSty::pigNumMax; i++) {
-                if((((pigFarm->totalSmallFlowerPigNums+pigFarm->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)/i)+((pigFarm->totalBlackPigNums+blackPig)/i))>pigFarm->totalPigStyNums) {
+                if((((pigFarm->getTotalSmallFlowerPigNums()+pigFarm->getTotalBigWhitePigNums()+smallFlowerPig+bigWhitePig)/i)+((pigFarm->getTotalBlackPigNums()+blackPig)/i))>PigFarm::totalPigStyNums) {
                     continue;
                 } else {
-                    if((pigFarm->totalBlackPigNums+blackPig)%i!=0&&(pigFarm->totalSmallFlowerPigNums+pigFarm->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)%i!=0) {
-                        if((((pigFarm->totalSmallFlowerPigNums+pigFarm->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)/i)+((pigFarm->totalBlackPigNums+blackPig)/i))+2>pigFarm->totalPigStyNums) {
+                    if((pigFarm->getTotalBlackPigNums()+blackPig)%i!=0&&(pigFarm->getTotalSmallFlowerPigNums()+pigFarm->getTotalBigWhitePigNums()+smallFlowerPig+bigWhitePig)%i!=0) {
+                        if((((pigFarm->getTotalSmallFlowerPigNums()+pigFarm->getTotalBigWhitePigNums()+smallFlowerPig+bigWhitePig)/i)+((pigFarm->getTotalBlackPigNums()+blackPig)/i))+2>PigFarm::totalPigStyNums) {
                             continue;
                         }
-                    } else if((pigFarm->totalBlackPigNums+blackPig)%i!=0||(pigFarm->totalSmallFlowerPigNums+pigFarm->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)%i!=0) {
-                        if((((pigFarm->totalSmallFlowerPigNums+pigFarm->totalBigWhitePigNums+smallFlowerPig+bigWhitePig)/i)+((pigFarm->totalBlackPigNums+blackPig)/i))+1>pigFarm->totalPigStyNums) {
+                    } else if((pigFarm->getTotalBlackPigNums()+blackPig)%i!=0||(pigFarm->getTotalSmallFlowerPigNums()+pigFarm->getTotalBigWhitePigNums()+smallFlowerPig+bigWhitePig)%i!=0) {
+                        if((((pigFarm->getTotalSmallFlowerPigNums()+pigFarm->getTotalBigWhitePigNums()+smallFlowerPig+bigWhitePig)/i)+((pigFarm->getTotalBlackPigNums()+blackPig)/i))+1>PigFarm::totalPigStyNums) {
                             continue;
                         }
                     }

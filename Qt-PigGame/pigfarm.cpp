@@ -243,28 +243,46 @@ int PigFarm::fever(int pigStyIndex,int pigIndex) {
     int day=1,deadPigNum=0;
     this->pigStys[pigStyIndex][pigIndex].infected=true;
     this->pigStys[pigStyIndex][pigIndex].infectedDay++;
-    while(this->totalPigNums!=deadPigNum) {
+    bool isfected;
+    while(true) {
         infecting();
         Pig*q;
+         isfected=false;
         for(int i=0; i<PigFarm::totalPigStyNums; i++)
         {
-            for(Pig*p=this->pigStys[i].first(); p!=this->pigStys[i].last()->succ; p=p->succ)
-            {
-                if(p->infected)
+                for(Pig*p=this->pigStys[i].first(); p!=this->pigStys[i].last()->succ; p=p->succ)
                 {
-                    p->infectedDay++;
-                    if(p->infectedDay>=7)
-                    {
-                        q=p;
-                        p=p->pred;
-                        q=this->pigStys[i].removePig(q);
-                        delete q;
-                        deadPigNum++;
 
+                    if(p->infected)
+                    {
+                        isfected=true;
+                        p->infectedDay++;
+                        if(p->infectedDay>=7)
+                        {
+                            q=p;
+                            p=p->pred;
+                            q=this->pigStys[i].removePig(q);
+                            delete q;
+                            deadPigNum++;
+                        }
                     }
+
+
                 }
 
 
+        }
+        if(!isfected)
+        {
+            this->totalPigNums-=deadPigNum;
+            break;
+        }
+        else
+        {
+            if(this->totalPigNums==deadPigNum)
+            {
+                this->totalPigNums=0;
+                break;
             }
         }
         day++;
@@ -337,40 +355,45 @@ void PigFarm::eachBreedDis(DrawGraph*draw,PigBreed::Type breed,int lo,int hi)
 void PigFarm::infecting()
 {
     for(int i=0; i<PigFarm::totalPigStyNums; i++) {
-        for(Pig*p=this->pigStys[i].first(); p!=this->pigStys[i].last()->succ; p=p->succ) {
-            if(p->infected&&p->infectedDay>0) {
-                for(Pig*q=this->pigStys[i].first(); q!=this->pigStys[i].last()->succ; q=q->succ) {
-                    if(q==p||q->infected)continue;
-                    else {
-                        if(rand()%2==1) {
-                            q->infected=true;
-                        }
-                    }
-                }
-                if(i-1>=0) {
-                    for(Pig*q=this->pigStys[i-1].first(); q!=this->pigStys[i-1].last()->succ; q=q->succ) {
-                        if(q->infected)continue;
+
+            for(Pig*p=this->pigStys[i].first(); p!=this->pigStys[i].last()->succ; p=p->succ) {
+
+                if(p->infected&&p->infectedDay>0) {
+                    for(Pig*q=this->pigStys[i].first(); q!=this->pigStys[i].last()->succ; q=q->succ) {
+                        if(q==p||q->infected)continue;
                         else {
-                            int t=rand()%20;
-                            if(t==1||t==2||t==3) { //%15¸ÅÂÊ
+                            if(rand()%2==1) {
                                 q->infected=true;
                             }
                         }
                     }
-                }
-                if(i+1<PigFarm::totalPigStyNums) {
-                    for(Pig*q=this->pigStys[i+1].first(); q!=this->pigStys[i+1].last()->succ; q=q->succ) {
-                        if(q->infected)continue;
-                        else {
-                            int t=rand()%20;
-                            if(t==1||t==2||t==3) { //%15¸ÅÂÊ
-                                q->infected=true;
+                    if(i-1>=0) {
+                        for(Pig*q=this->pigStys[i-1].first(); q!=this->pigStys[i-1].last()->succ; q=q->succ) {
+                            if(q->infected)continue;
+                            else {
+                                int t=rand()%20;
+                                if(t==1||t==2||t==3) { //%15¸ÅÂÊ
+                                    q->infected=true;
+                                }
+                            }
+                        }
+                    }
+                    if(i+1<PigFarm::totalPigStyNums) {
+                        for(Pig*q=this->pigStys[i+1].first(); q!=this->pigStys[i+1].last()->succ; q=q->succ) {
+                            if(q->infected)continue;
+                            else {
+                                int t=rand()%20;
+                                if(t==1||t==2||t==3) { //%15¸ÅÂÊ
+                                    q->infected=true;
+                                }
                             }
                         }
                     }
                 }
             }
-        }
+
+
+
     }
 }
 void PigFarm::clearPigFarm()

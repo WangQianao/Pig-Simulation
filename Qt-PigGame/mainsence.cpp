@@ -167,17 +167,17 @@ MainSence::MainSence(QWidget *parent) :
 
             if(item==items[0])
             {
-                pigFarm->eachBreedDis(draw,PigBreed::black,0,pigFarm->flowerPigStyIndex);
+                pigFarm->eachBreedDis(draw,PigBreed::black,0,pigFarm->getFlowerPigStyIndex());
 
             }
             else if(item==items[1])
             {
 
-                pigFarm->eachBreedDis(draw,PigBreed::smallFlower,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
+                pigFarm->eachBreedDis(draw,PigBreed::smallFlower,pigFarm->getFlowerPigStyIndex(),PigFarm::totalPigStyNums);
             }else
             {
 
-                pigFarm->eachBreedDis(draw,PigBreed::bigWhite,pigFarm->flowerPigStyIndex,PigFarm::totalPigStyNums);
+                pigFarm->eachBreedDis(draw,PigBreed::bigWhite,pigFarm->getFlowerPigStyIndex(),PigFarm::totalPigStyNums);
             }
 
         }
@@ -295,8 +295,16 @@ void MainSence::feverSimulation(PigFarm*pigFarm)
         msgBox.setIcon(QMessageBox::Information);
         msgBox.setText("现在开始模拟,刚才选择的猪已患上猪瘟");
         msgBox.exec();
-        t="模拟状态下:猪瘟的扩展几率为:\n1.同一个猪圈的猪每天被传染几率是50%\n2.相邻猪圈的猪每天被传染的几率是15%\n3.不相邻的猪圈的猪不传染\n假定一只猪从感染猪瘟到死亡需要7天\n";
-        QString s=QString("经过模拟,该猪的猪瘟后,如果不采取任何措施,%1天后养猪场里的猪便会死光").arg(pigFarm->fever(styIndex,pigIndex));
+        t="模拟状态下:猪瘟的扩展几率为:\n1.同一个猪圈的猪每天被传染几率是50%\n2.相邻猪圈的猪每天被传染的几率是15%\n3.不相邻的猪圈的猪不传染\n假定一只猪从感染猪瘟到死亡需要7天\n经过模拟,该猪的猪瘟后,如果不采取任何措施\n";
+        QString s;
+        int a=pigFarm->fever(styIndex,pigIndex);
+        if(pigFarm->getTotalPigNums()==0)s=QString("%1天后养猪场里的猪便会死光").arg(a);
+        else
+        {
+
+             s=QString("%1天后,养猪场里还有%2头猪存活").arg(a).arg(pigFarm->getTotalPigNums());
+             pigFarm->clearPigFarm();
+        }
         t.append(s);
         QFont fon;
         fon.setFamily("华文新魏");

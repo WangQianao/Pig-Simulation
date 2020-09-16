@@ -10,7 +10,6 @@ class GameMenu;
 class PigFarm : public QObject
 {
     Q_OBJECT
-public:
 
     int totalPigNums;
     int totalBlackPigNums;
