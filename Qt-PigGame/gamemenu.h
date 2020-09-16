@@ -11,7 +11,7 @@ public:
     CheckMenu * checkMenu=NULL;
     int gameDay=1;    //游戏进行天数
     int lastSalePigDay=1; //上一次出售以及购入猪的时间
-    double money=1000000;// 游戏钱数
+    double money=900000;// 游戏钱数
     void paintEvent(QPaintEvent *event);
 
 
