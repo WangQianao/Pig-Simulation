@@ -11,7 +11,7 @@
 #include <QFont>
 #include <QPainter>
 #include <QPixmap>
-
+#include<QDebug>
 MainSence::MainSence(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainSence)
@@ -504,7 +504,7 @@ bool MainSence::initializeGameByFileAndPrint(QString filename,PigFarm*pigFarm)
                 }
                 s=QString("编号%1 ").arg(index);
                 s.append(p->pigPrint());
-                edit->append(s);
+                edit->append(s);           
                 pigFarm->pigStys[i].insert(p);
                 index++;
             }

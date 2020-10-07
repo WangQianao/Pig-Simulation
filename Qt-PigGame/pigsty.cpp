@@ -46,7 +46,8 @@ void PigSty::decreasePigNums(PigBreed::Type breed)
 }
 void PigSty::insert(Pig*p)
 {
-    this->insert(p->getBreed());
+    this->last()->insert(p);
+    this->increasePigNums(p->getBreed());
 }
 void PigSty::insert(PigBreed::Type breed)
 {
